@@ -60,6 +60,7 @@ main {
   width: 70px;
   height: 70px;
   background: linear-gradient(135deg, #ef4444, #dc2626);
+  opacity: 0.5;
 }
 
 .add-task {
