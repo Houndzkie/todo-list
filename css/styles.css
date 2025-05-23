@@ -25,13 +25,6 @@ main {
   background-color: #F4F3F8;
 }
 
-input {
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
 .active-task, .completed-task, .delete-task, .add-task {
   display: flex;
   cursor: pointer;
@@ -39,6 +32,12 @@ input {
   align-items: center;
   font-weight: bold;
   color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.active-task:hover,  .completed-task:hover,  .delete-task:hover, .add-task:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .active-task, .completed-task, .add-task {
@@ -100,13 +99,23 @@ input {
   display: flex;
   flex-direction: column;
   background-color: white;
+  transition: transform 0.2s ease;
 }
 
+.task:hover {
+  transform: scale(1.01);
+}
 
 .task-operations {
   height: 50px;
   padding: 10px 10px;
   border-bottom: solid 3px #F1F5F9;
+}
+
+.checkbox {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
 }
 
 .title {
