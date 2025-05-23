@@ -22,7 +22,7 @@ main {
   row-gap: 25px;
   padding: 50px 35px;
   border-radius: 0 0 25px 25px;
-  background-color: #F7F8FD;
+  background-color: #F4F3F8;
 }
 
 input {
@@ -32,13 +32,39 @@ input {
   border-radius: 5px;
 }
 
-.active-task, .completed-task, .delete-task, .edit-task, .add-task {
+.active-task, .completed-task, .delete-task, .add-task {
+  display: flex;
   cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+}
+
+.active-task, .completed-task, .add-task {
   font-size: 20px;
   border-radius: 50px;
   width: 175px;
   white-space: nowrap;
-  text-align: center;
+}
+
+.active-task {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+}
+
+.completed-task {
+  background: linear-gradient(135deg, #059669, #0d9488);
+}
+
+.delete-task {
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.add-task {
+  background: linear-gradient(135deg, #facc15, #eab308);
 }
 
 .title {
@@ -52,8 +78,7 @@ input {
 }
 
 .status div {
-  border: solid 1px black;
-  margin-left: 80px;
+  margin-left: 40px;
 }
 
 .operations {
@@ -63,27 +88,25 @@ input {
 }
 
 .operations div {
-  margin-right: 80px;
-  border: solid 1px black;
-}
-
-.delete-task {
-  width: 50px;
+  margin-right: 40px;
 }
 
 .task {
-  border: solid 1px black;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 10px;
   height: 250px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  background-color: white;
 }
 
 
 .task-operations {
   height: 50px;
   padding: 10px 10px;
+  border-bottom: solid 3px #F1F5F9;
 }
 
 .title {
@@ -91,22 +114,30 @@ input {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding-right: 10px;
+  color: #1f2937;
+  font-size: 18px;
 }
 
 .description {
   align-items: normal;
-  height: 150px;
-  font-size: 18px;
-  padding: 10px;
+  height: 165px;
+  font-size: 15px;
+  padding: 0px 10px 10px;
   line-height: 1.2;
-  overflow: hidden;
   text-overflow: ellipsis;
+  color: #6b7280;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .time {
   height: 50px;
-  font-size: 20px;
+  font-size: 16px;
   padding-left: 10px;
+  color: #475569;
+  background-color: #F1F5F9;
 }
 
 .task-operations, .time {
