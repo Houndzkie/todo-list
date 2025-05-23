@@ -1,0 +1,116 @@
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #333;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  border-radius: 25px 25px 0 0;
+  position: relative;
+  background-color: #FBFCFD;
+  padding: 50px 50px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 25px;
+  row-gap: 25px;
+  padding: 50px 35px;
+  border-radius: 0 0 25px 25px;
+  background-color: #F7F8FD;
+}
+
+input {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.active-task, .completed-task, .delete-task, .edit-task, .add-task {
+  cursor: pointer;
+  font-size: 20px;
+  border-radius: 50px;
+  width: 175px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.status {
+  display: flex;
+  position: absolute;
+}
+
+.status div {
+  border: solid 1px black;
+  margin-left: 80px;
+}
+
+.operations {
+  position: absolute;
+  right: 0;
+  display: flex;
+}
+
+.operations div {
+  margin-right: 80px;
+  border: solid 1px black;
+}
+
+.delete-task {
+  width: 50px;
+}
+
+.task {
+  border: solid 1px black;
+  border-radius: 10px;
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+.task-operations {
+  height: 50px;
+  padding: 10px 10px;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+.description {
+  align-items: normal;
+  height: 150px;
+  font-size: 18px;
+  padding: 10px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.time {
+  height: 50px;
+  font-size: 20px;
+  padding-left: 10px;
+}
+
+.task-operations, .time {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
