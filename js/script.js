@@ -1,16 +1,22 @@
 const checkboxes = document.querySelectorAll('.checkbox');
+const checkBtn = document.querySelector('.check-task');
 const deleteBtn = document.querySelector('.delete-task');
 
-checkboxes.forEach((checkbox) => {
-  checkbox.addEventListener('change', () => {
-    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+function toggle(btn, checkboxes) {
+  checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
 
-    if (anyChecked) {
-      deleteBtn.style.opacity = 1;
-      deleteBtn.style.pointerEvents = 'auto';
-    } else {
-      deleteBtn.style.opacity = 0.5;
-      deleteBtn.style.pointerEvents = 'none';
-    }
+      if (anyChecked) {
+        btn.style.opacity = 1;
+        btn.style.pointerEvents = 'auto';
+      } else {
+        btn.style.opacity = 0.5;
+        btn.style.pointerEvents = 'none';
+      }
+    });
   });
-});
+}
+
+toggle(checkBtn, checkboxes);
+toggle(deleteBtn, checkboxes);
