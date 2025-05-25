@@ -1,0 +1,106 @@
+.popup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  width: 40%;
+  height: 80%;
+  background-color: white;
+}
+
+.popup-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px 20px 0 0;
+  padding: 5px;
+}
+
+.popup-body {
+  padding: 20px 30px;
+}
+
+.popup-title {
+  color: white;
+  margin-left: 30px;
+}
+
+.form-label {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-input {
+  border-radius: 5px;
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-title {
+  height: 20px;
+}
+
+.form-textarea {
+  resize: none;
+  height: 140px;
+  max-height: 140px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.time-input {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.popup-footer {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.time-btn {
+  width: 180px;
+  height: 15px;
+}
+
+.cancel-btn, .save-btn {
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.popup-btn {
+  margin-right: 25px;
+  height: 50px;
+  width: 125px;
+  font-weight: bold;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #059669, #0d9488);
+}
