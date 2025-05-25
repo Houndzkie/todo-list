@@ -4,151 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
-    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/homepage.css">
   </head>
   <body>
-    <header>
-      <div class="status">
-        <div class="active-task">
-          <p>
-            📋 Active Tasks
-          </p>
+    <div class="homepage">
+      <header>
+        <div class="status">
+          <div class="active-task">
+            <p>
+              📋 Active Tasks
+            </p>
+          </div>
+          <div class="completed-task">
+            <p>
+              ✅ Completed
+            </p>
+          </div>
         </div>
-        <div class="completed-task">
-          <p>
-            ✅ Completed
-          </p>
+        <div class="operations">
+          <button class="check-task" title="Check Selected Task">
+            ✓
+          </button>
+          <button class="delete-task" title="Delete Selected Task">
+            🗑️
+          </button>
+          <button class="add-task">
+            ➕ Add Task
+          </button>
         </div>
-      </div>
-      <div class="operations">
-        <button class="check-task" title="Check Selected Task">
-          ✓
-        </button>
-        <button class="delete-task" title="Delete Selected Task">
-          🗑️
-        </button>
-        <button class="add-task">
-          ➕ Add Task
-        </button>
-      </div>
-    </header>
+      </header>
 
-    <main>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
+      <main>
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
           </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
           </div>
-        </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
-        </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
-        </div>
-      </div>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
-          </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
           </div>
         </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
-        </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
-        </div>
-      </div>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
           </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
           </div>
-        </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
-        </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
-        </div>
-      </div>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
-          </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
           </div>
         </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
-        </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
-        </div>
-      </div>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
           </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
           </div>
-        </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
-        </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
-        </div>
-      </div>
-      <div class="task">
-        <div class="task-operations">
-          <div class="input-div">
-            <input type="checkbox" class="checkbox">
-          </div>
-          <div class="title">
-            <span>Doing Leetcode and Projects</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
           </div>
         </div>
-        <div class="description">
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-          </p>
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
+          </div>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
+          </div>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
+          </div>
         </div>
-        <div class="time">
-          <p>🕐 8:00 AM - 4:00 PM</p>
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
+          </div>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
+          </div>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
+          </div>
         </div>
-      </div>
-    </main>
+        <div class="task">
+          <div class="task-operations">
+            <div class="input-div">
+              <input type="checkbox" class="checkbox">
+            </div>
+            <div class="title">
+              <span>Doing Leetcode and Projects</span>
+              <button class="edit-task" title="Edit Task">✏️</button>
+            </div>
+          </div>
+          <div class="description">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
+            </p>
+          </div>
+          <div class="time">
+            <p>🕐 8:00 AM - 4:00 PM</p>
+          </div>
+        </div>
+      </main>
+    </div>
 
     <script src="js/script.js"></script>
     <script src="js/overlay.js"></script>

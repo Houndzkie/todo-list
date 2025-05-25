@@ -4,6 +4,7 @@ body {
   padding: 2rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #333;
+  margin: 0;
 }
 
 header {
@@ -23,6 +24,10 @@ main {
   padding: 50px 35px;
   border-radius: 0 0 25px 25px;
   background-color: #F4F3F8;
+}
+
+.homepage {
+  filter: blur(5px);
 }
 
 .active-task, .completed-task, .check-task, .delete-task, .add-task {
