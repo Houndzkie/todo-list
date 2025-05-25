@@ -27,6 +27,7 @@ main {
 }
 
 .homepage {
+  min-height: 600px;
   filter: blur(5px);
 }
 
@@ -193,7 +194,7 @@ main {
   font-size: 16px;
   padding-left: 10px;
   color: #475569;
-  background-color: #F1F5F9;
+  background-color: #F2F6FA;
 }
 
 .task-operations, .time {

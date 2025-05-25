@@ -1,28 +1,24 @@
-body {
-  min-height: 100vh;
-  padding: 2rem;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  color: #333;
-  margin: 0;
-}
-
 .popup-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  width: 100%;
+  width: 100vw;
   margin: 0;
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .popup {
   display: flex;
   flex-direction: column;
-  border: solid 1px black;
   border-radius: 20px;
   width: 40%;
   height: 80%;
-  z-index: 1000;
+  background-color: white;
 }
 
 .popup-header {
@@ -92,7 +88,7 @@ body {
 }
 
 .popup-btn {
-  margin-right: 20px;
+  margin-right: 25px;
   height: 50px;
   width: 125px;
   font-weight: bold;
