@@ -18,7 +18,7 @@ header {
 
 main {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr 1fr;
   column-gap: 25px;
   row-gap: 25px;
   padding: 50px 35px;
@@ -26,9 +26,27 @@ main {
   background-color: #F4F3F8;
 }
 
+@media (max-width: 699px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1200px) {
+  main {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1600px) {
+  main {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
 .homepage {
   min-height: 600px;
-  filter: blur(5px);
+  /* filter: blur(5px); */
 }
 
 .active-task, .completed-task, .check-task, .delete-task, .add-task {
