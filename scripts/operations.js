@@ -1,5 +1,61 @@
-const add = document.querySelector('.add-task');
+function addTask() {
+  let popup = document.querySelector('.add-task');
+  let cancel = document.querySelector('.cancel-btn');
+  let save = document.querySelector('.save-btn');
 
+  popup.addEventListener('click', () => {
+    let showPopup = document.querySelector('.popup-container');
+    showPopup.style.display = 'flex';
+  })
+
+  cancel.addEventListener('click', () => {
+    let hidePopup = document.querySelector('.popup-container');
+    hidePopup.style.display = 'none';
+  })
+
+  save.addEventListener('click', () => {
+    let title = document.querySelector('#taskTitle').value;
+    let description = document.querySelector('#taskDescription').value;
+    let start = document.querySelector('#start-time').value;
+    let end = document.querySelector('#end-time').value;
+
+    let main = document.querySelector('main');
+    let task = `
+          <div class="task">
+            <div class="task-operations">
+              <div class="input-div">
+                <input type="checkbox" class="checkbox">
+              </div>
+              <div class="title">
+                <span>${title}</span>
+                <button class="edit-task" title="Edit Task">✏️</button>
+              </div>
+            </div>
+            <div class="description">
+              <p>
+                ${description}
+              </p>
+            </div>
+            <div class="time">
+              <p>🕐 ${start} - ${end}</p>
+            </div>
+          </div>
+      `
+
+      main.insertAdjacentHTML('beforeend', task);
+
+      let hidePopup = document.querySelector('.popup-container');
+      hidePopup.style.display = 'none';
+  })
+}
+
+
+
+addTask();
+
+
+
+/*
 add.addEventListener('click', () => {
   let main = document.querySelector('main');
   let task = `
@@ -26,3 +82,4 @@ add.addEventListener('click', () => {
 
   main.insertAdjacentHTML('beforeend', task);
 });
+*/
