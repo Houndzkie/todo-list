@@ -9,11 +9,12 @@ body {
 
 header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   border-radius: 25px 25px 0 0;
-  position: relative;
   background-color: #FBFCFD;
-  padding: 50px 50px;
+  padding: 20px 100px;
 }
 
 main {
@@ -26,15 +27,35 @@ main {
   background-color: #F4F3F8;
 }
 
+.status, .operations {
+  display: flex;
+  gap: 30px;
+}
+
 @media (max-width: 699px) {
   main {
     grid-template-columns: 1fr;
+  }
+
+  header {
+    justify-content: center;
+    row-gap: 20px;
+  }
+
+  .status, .operations {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
 
 @media (min-width: 700px) and (max-width: 1200px) {
   main {
     grid-template-columns: 1fr 1fr;
+  }
+
+  header {
+    justify-content: center;
+    row-gap: 20px;
   }
 }
 
@@ -88,7 +109,6 @@ main {
 
 .check-task, .delete-task, .add-task {
   border: none;
-  margin-right: 35px;
 }
 
 .check-task {
@@ -106,26 +126,10 @@ main {
 .title {
   font-size: 20px;
   font-weight: bold;
+  gap: 
 }
 
-.status {
-  display: flex;
-  position: absolute;
-}
 
-.status div {
-  margin-left: 40px;
-}
-
-.operations {
-  position: absolute;
-  right: 0;
-  display: flex;
-}
-
-.operations div {
-  margin-right: 40px;
-}
 
 .task {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
