@@ -1,23 +1,41 @@
-function addTask() {
+function formatTime(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
+
+function showTask() {
   let popup = document.querySelector('.add-task');
-  let cancel = document.querySelector('.cancel-btn');
-  let save = document.querySelector('.save-btn');
 
   popup.addEventListener('click', () => {
     let showPopup = document.querySelector('.popup-container');
     showPopup.style.display = 'flex';
   })
+}
+
+function cancelTask() {
+  let cancel = document.querySelector('.cancel-btn');
 
   cancel.addEventListener('click', () => {
     let hidePopup = document.querySelector('.popup-container');
     hidePopup.style.display = 'none';
   })
+}
+
+function pushTask(title, description, start, end) {
+  tasks.push({title, description, start, end});
+  console.log(tasks);
+}
+
+function saveTask() {
+  let save = document.querySelector('.save-btn');
 
   save.addEventListener('click', () => {
     let title = document.querySelector('#taskTitle').value;
     let description = document.querySelector('#taskDescription').value;
-    let start = document.querySelector('#start-time').value;
-    let end = document.querySelector('#end-time').value;
+    let start = formatTime(document.querySelector('#start-time').value);
+    let end = formatTime(document.querySelector('#end-time').value);
 
     let main = document.querySelector('main');
     let task = `
@@ -46,40 +64,15 @@ function addTask() {
 
       let hidePopup = document.querySelector('.popup-container');
       hidePopup.style.display = 'none';
+
+      pushTask(title, description, start, end);
   })
 }
 
-
+function addTask() {
+  showTask();
+  saveTask();
+  cancelTask();
+}
 
 addTask();
-
-
-
-/*
-add.addEventListener('click', () => {
-  let main = document.querySelector('main');
-  let task = `
-        <div class="task">
-          <div class="task-operations">
-            <div class="input-div">
-              <input type="checkbox" class="checkbox">
-            </div>
-            <div class="title">
-              <span>Doing Leetcode and Projects</span>
-              <button class="edit-task" title="Edit Task">✏️</button>
-            </div>
-          </div>
-          <div class="description">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, urna eu tincidunt consectetur, nisi nunc gravida augue, nec tempor justo ipsum ac ligula.
-            </p>
-          </div>
-          <div class="time">
-            <p>🕐 8:00 AM - 4:00 PM</p>
-          </div>
-        </div>
-  `
-
-  main.insertAdjacentHTML('beforeend', task);
-});
-*/
