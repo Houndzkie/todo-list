@@ -130,3 +130,4 @@ function editTask() {
 
 addTask();
 editTask();
+showPopup();
