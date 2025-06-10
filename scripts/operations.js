@@ -1,3 +1,7 @@
+let edit = false;
+let currentTask = null;
+
+
 function formatTime(time) {
   const [hour, minute] = time.split(':').map(Number);
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -5,12 +9,14 @@ function formatTime(time) {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
-function showTask() {
-  let popup = document.querySelector('.add-task');
+function showTask(query, str) {
+  let popup = document.querySelector(query);
 
   popup.addEventListener('click', () => {
     let showPopup = document.querySelector('.popup-container');
     showPopup.style.display = 'flex';
+    let title = document.querySelector('.popup-title');
+    title.innerHTML = str;
   })
 }
 
@@ -69,10 +75,31 @@ function saveTask() {
   })
 }
 
+function saveEditedTask() {
+  let save = document.querySelector('.save-btn');
+
+  let title = document.querySelector('#taskTitle').value;
+  let description = document.querySelector('#taskDescription').value;
+  let start = formatTime(document.querySelector('#start-time').value);
+  let end = formatTime(document.querySelector('#end-time').value);
+
+
+
+  let hidePopup = document.querySelector('.popup-container');
+  hidePopup.style.display = 'none';
+}
+
 function addTask() {
-  showTask();
+  showTask(".add-task", "Add Task");
   saveTask();
   cancelTask();
 }
 
+function editTask() {
+  showTask(".edit-task", "Edit Task");
+  saveEditedTask();
+  cancelTask();
+}
+
 addTask();
+editTask();
