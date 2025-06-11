@@ -1,3 +1,11 @@
+// Utility: Converts "14:30" -> "2:30 PM"
+function formatTime(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
+
 // Task class to store task data
 class Task {
   constructor(title, description, start, end) {
@@ -169,15 +177,6 @@ class TaskManager {
     toggle(this.deleteBtn);
   }
 }
-
-// Utility: Converts "14:30" -> "2:30 PM"
-function formatTime(time) {
-  const [hour, minute] = time.split(':').map(Number);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
-}
-
 
 // Start everything
 const taskManager = new TaskManager();
