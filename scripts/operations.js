@@ -1,5 +1,152 @@
-let editMode = false;
-let currentTask = null;
+class Task {
+  constructor(title, description, start, end) {
+    this.title = title;
+    this.description = description;
+    this.start = start;
+    this.end = end;
+  }
+}
+
+class TaskEditor {
+  constructor(taskManager) {
+    this.taskManager = taskManager;
+    this.editMode = false;
+    this.currentTaskElement = null;
+
+    this.saveBtn = document.querySelector('.save-btn');
+    this.cancelBtn = document.querySelector('.cancel-btn');
+    this.popup = document.querySelector('.popup-container');
+    this.titleEl = document.querySelector('#taskTitle');
+    this.descriptionEl = document.querySelector('#taskDescription');
+    this.startEl = document.querySelector('#start-time');
+    this.endEl = document.querySelector('#end-time');
+
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    this.saveBtn.addEventListener('click', () => this.save());
+    this.cancelBtn.addEventListener('click', () => this.close());
+  }
+
+  open(title = "Add Task", taskElement = null) {
+    document.querySelector('.popup-title').innerText = title;
+    this.popup.style.display = 'flex';
+
+    if (taskElement) {
+      this.editMode = true;
+      this.currentTaskElement = taskElement;
+      const task = this.taskManager.getTaskFromElement(taskElement);
+      this.titleEl.value = task.title;
+      this.descriptionEl.value = task.description;
+      this.startEl.value = task.start;
+      this.endEl.value = task.end;
+    } else {
+      this.editMode = false;
+      this.clearForm();
+    }
+  }
+
+  clearForm() {
+    this.titleEl.value = '';
+    this.descriptionEl.value = '';
+    this.startEl.value = '';
+    this.endEl.value = '';
+  }
+
+  close() {
+    this.popup.style.display = 'none';
+    this.clearForm();
+  }
+
+  save() {
+    const title = this.titleEl.value;
+    const description = this.descriptionEl.value;
+    const start = formatTime(this.startEl.value);
+    const end = formatTime(this.endEl.value);
+
+    if (this.editMode) {
+      this.taskManager.updateTask(this.currentTaskElement, new Task(title, description, start, end));
+    } else {
+      this.taskManager.addTask(new Task(title, description, start, end));
+    }
+
+    this.close();
+  }
+}
+
+class TaskManager {
+  constructor() {
+    this.tasks = [];
+    this.main = document.querySelector('main');
+    this.editor = new TaskEditor(this);
+
+    document.querySelector('.add-task').addEventListener('click', () => {
+      this.editor.open("Add Task");
+    });
+  }
+
+  formatTaskHTML(task) {
+    return `
+      <div class="task">
+        <div class="task-operations">
+          <div class="input-div">
+            <input type="checkbox" class="checkbox">
+          </div>
+          <div class="title">
+            <span>${task.title}</span>
+            <button class="edit-task" title="Edit Task">✏️</button>
+          </div>
+        </div>
+        <div class="description">
+          <p>${task.description}</p>
+        </div>
+        <div class="time">
+          <p>🕐 ${task.start} - ${task.end}</p>
+        </div>
+      </div>`;
+  }
+
+  addTask(task) {
+    this.tasks.push(task);
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = this.formatTaskHTML(task);
+    const taskElement = wrapper.firstElementChild;
+
+    taskElement.querySelector('.edit-task').addEventListener('click', () => {
+      this.editor.open("Edit Task", taskElement);
+    });
+
+    this.main.appendChild(taskElement);
+  }
+
+  getTaskFromElement(el) {
+    const title = el.querySelector('.title span').innerText;
+    const description = el.querySelector('.description p').innerText;
+    const timeText = el.querySelector('.time p').innerText.replace('🕐 ', '');
+    const [start, end] = timeText.split(' - ');
+    return new Task(title, description, start, end);
+  }
+
+  updateTask(el, updatedTask) {
+    el.querySelector('.title span').innerText = updatedTask.title;
+    el.querySelector('.description p').innerText = updatedTask.description;
+    el.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
+  }
+}
+
+function formatTime(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
+
+const taskManager = new TaskManager();
+
+
+/*
+
 
 function closePopup() {
   let cancel = document.querySelector('.cancel-btn');
@@ -36,98 +183,4 @@ function showPopup(mode, taskElement = null) {
 
   closePopup();
 }
-
-
-function formatTime(time) {
-  const [hour, minute] = time.split(':').map(Number);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
-}
-
-function showTask(query, str) {
-  let popup = document.querySelector(query);
-
-  popup.addEventListener('click', () => {
-    let showPopu = document.querySelector('.popup-container');
-    showPopu.style.display = 'flex';
-    let title = document.querySelector('.popup-title');
-    title.innerHTML = str;
-  })
-}
-
-function pushTask(title, description, start, end) {
-  tasks.push({title, description, start, end});
-  console.log(tasks);
-}
-
-function saveTask() {
-  let save = document.querySelector('.save-btn');
-
-  save.addEventListener('click', () => {
-    let title = document.querySelector('#taskTitle').value;
-    let description = document.querySelector('#taskDescription').value;
-    let start = formatTime(document.querySelector('#start-time').value);
-    let end = formatTime(document.querySelector('#end-time').value);
-
-    let main = document.querySelector('main');
-    let task = `
-          <div class="task">
-            <div class="task-operations">
-              <div class="input-div">
-                <input type="checkbox" class="checkbox">
-              </div>
-              <div class="title">
-                <span>${title}</span>
-                <button class="edit-task" title="Edit Task">✏️</button>
-              </div>
-            </div>
-            <div class="description">
-              <p>
-                ${description}
-              </p>
-            </div>
-            <div class="time">
-              <p>🕐 ${start} - ${end}</p>
-            </div>
-          </div>
-      `
-
-      main.insertAdjacentHTML('beforeend', task);
-
-      let hidePopup = document.querySelector('.popup-container');
-      hidePopup.style.display = 'none';
-
-      pushTask(title, description, start, end);
-  })
-}
-
-function saveEditedTask() {
-  let save = document.querySelector('.save-btn');
-
-  let title = document.querySelector('#taskTitle').value;
-  let description = document.querySelector('#taskDescription').value;
-  let start = formatTime(document.querySelector('#start-time').value);
-  let end = formatTime(document.querySelector('#end-time').value);
-
-
-
-  let hidePopup = document.querySelector('.popup-container');
-  hidePopup.style.display = 'none';
-}
-
-function addTask() {
-  showTask(".add-task", "Add Task");
-  saveTask();
-  cancelTask();
-}
-
-function editTask() {
-  showTask(".edit-task", "Edit Task");
-  saveEditedTask();
-  cancelTask();
-}
-
-addTask();
-editTask();
-showPopup();
+*/
