@@ -1,3 +1,12 @@
+// Utility: Converts "14:30" -> "2:30 PM"
+function formatTime(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
+
+// Task class to store task data
 class Task {
   constructor(title, description, start, end) {
     this.title = title;
@@ -7,6 +16,7 @@ class Task {
   }
 }
 
+// TaskEditor manages the popup modal for adding/editing
 class TaskEditor {
   constructor(taskManager) {
     this.taskManager = taskManager;
@@ -36,6 +46,7 @@ class TaskEditor {
     if (taskElement) {
       this.editMode = true;
       this.currentTaskElement = taskElement;
+
       const task = this.taskManager.getTaskFromElement(taskElement);
       this.titleEl.value = task.title;
       this.descriptionEl.value = task.description;
@@ -47,16 +58,16 @@ class TaskEditor {
     }
   }
 
+  close() {
+    this.popup.style.display = 'none';
+    this.clearForm();
+  }
+
   clearForm() {
     this.titleEl.value = '';
     this.descriptionEl.value = '';
     this.startEl.value = '';
     this.endEl.value = '';
-  }
-
-  close() {
-    this.popup.style.display = 'none';
-    this.clearForm();
   }
 
   save() {
@@ -75,12 +86,18 @@ class TaskEditor {
   }
 }
 
+// TaskManager handles rendering and logic
 class TaskManager {
   constructor() {
     this.tasks = [];
     this.main = document.querySelector('main');
     this.editor = new TaskEditor(this);
 
+    // Button references for check and delete
+    this.checkBtn = document.querySelector('.check-task');
+    this.deleteBtn = document.querySelector('.delete-task');
+
+    // "Add Task" click handler
     document.querySelector('.add-task').addEventListener('click', () => {
       this.editor.open("Add Task");
     });
@@ -109,15 +126,18 @@ class TaskManager {
 
   addTask(task) {
     this.tasks.push(task);
+
     const wrapper = document.createElement('div');
     wrapper.innerHTML = this.formatTaskHTML(task);
     const taskElement = wrapper.firstElementChild;
 
+    // Edit button event
     taskElement.querySelector('.edit-task').addEventListener('click', () => {
       this.editor.open("Edit Task", taskElement);
     });
 
     this.main.appendChild(taskElement);
+    this.bindCheckboxToggles(); // Update button state
   }
 
   getTaskFromElement(el) {
@@ -132,22 +152,41 @@ class TaskManager {
     el.querySelector('.title span').innerText = updatedTask.title;
     el.querySelector('.description p').innerText = updatedTask.description;
     el.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
+    this.bindCheckboxToggles();
+  }
+
+  bindCheckboxToggles() {
+    const checkboxes = document.querySelectorAll('.checkbox');
+
+    const toggle = (btn) => {
+      const update = () => {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        btn.style.opacity = anyChecked ? 1 : 0.5;
+        btn.style.pointerEvents = anyChecked ? 'auto' : 'none';
+      };
+
+      checkboxes.forEach(cb => {
+        cb.removeEventListener('change', update); // Avoid duplicate listeners
+        cb.addEventListener('change', update);
+      });
+
+      update(); // Initial state
+    };
+
+    toggle(this.checkBtn);
+    toggle(this.deleteBtn);
   }
 }
 
-function formatTime(time) {
-  const [hour, minute] = time.split(':').map(Number);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
-}
-
+// Start everything
 const taskManager = new TaskManager();
 
 
+
+
+
+
 /*
-
-
 function closePopup() {
   let cancel = document.querySelector('.cancel-btn');
 
