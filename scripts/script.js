@@ -6,171 +6,175 @@ function formatTime(time) {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
-// Data storage for all tasks
-const tasks = [];
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Data storage for all tasks
+  const tasks = [];
 
-// Cached DOM elements
-const main = document.querySelector('main');
-const popup = document.querySelector('.popup-container');
-const titleEl = document.querySelector('#taskTitle');
-const descriptionEl = document.querySelector('#taskDescription');
-const startEl = document.querySelector('#start-time');
-const endEl = document.querySelector('#end-time');
-const saveBtn = document.querySelector('.save-btn');
-const cancelBtn = document.querySelector('.cancel-btn');
-const checkBtn = document.querySelector('.check-task');
-const deleteBtn = document.querySelector('.delete-task');
-const addTaskBtn = document.querySelector('.add-task');
+  // Cached DOM elements
+  const main = document.querySelector('main');
+  const popup = document.querySelector('.popup-container');
+  const titleEl = document.querySelector('#taskTitle');
+  const descriptionEl = document.querySelector('#taskDescription');
+  const startEl = document.querySelector('#start-time');
+  const endEl = document.querySelector('#end-time');
+  const saveBtn = document.querySelector('.save-btn');
+  const cancelBtn = document.querySelector('.cancel-btn');
+  const checkBtn = document.querySelector('.check-task');
+  const deleteBtn = document.querySelector('.delete-task');
+  const addTaskBtn = document.querySelector('.add-task');
 
-// Editor state
-let editMode = false;
-let currentTaskElement = null;
+  // Editor state
+  let editMode = false;
+  let currentTaskElement = null;
 
-// =============================
-// Task Logic
-// =============================
+  // =============================
+  // Task Logic
+  // =============================
 
-function createTask(title, description, start, end) {
-  return { title, description, start, end };
-}
-
-function formatTaskHTML(task) {
-  return `
-    <div class="task">
-      <div class="task-operations">
-        <div class="input-div">
-          <input type="checkbox" class="checkbox">
-        </div>
-        <div class="title">
-          <span>${task.title}</span>
-          <button class="edit-task" title="Edit Task">✏️</button>
-        </div>
-      </div>
-      <div class="description">
-        <p>${task.description}</p>
-      </div>
-      <div class="time">
-        <p>🕐 ${task.start} - ${task.end}</p>
-      </div>
-    </div>`;
-}
-
-function addTask(task) {
-  tasks.push(task);
-
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = formatTaskHTML(task);
-  const taskElement = wrapper.firstElementChild;
-
-  taskElement.querySelector('.edit-task').addEventListener('click', () => {
-    openEditor("Edit Task", taskElement);
-  });
-
-  main.appendChild(taskElement);
-  bindCheckboxToggles();
-}
-
-function updateTask(taskEl, updatedTask) {
-  taskEl.querySelector('.title span').innerText = updatedTask.title;
-  taskEl.querySelector('.description p').innerText = updatedTask.description;
-  taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
-  bindCheckboxToggles();
-}
-
-function getTaskFromElement(el) {
-  const title = el.querySelector('.title span').innerText;
-  const description = el.querySelector('.description p').innerText;
-  const timeText = el.querySelector('.time p').innerText.replace('🕐 ', '');
-  const [start, end] = timeText.split(' - ');
-  return createTask(title, description, start, end);
-}
-
-// =============================
-// Popup / Editor Logic
-// =============================
-
-function clearForm() {
-  titleEl.value = '';
-  descriptionEl.value = '';
-  startEl.value = '';
-  endEl.value = '';
-}
-
-function openEditor(title = "Add Task", taskElement = null) {
-  document.querySelector('.popup-title').innerText = title;
-  popup.style.display = 'flex';
-
-  if (taskElement) {
-    editMode = true;
-    currentTaskElement = taskElement;
-    const task = getTaskFromElement(taskElement);
-    titleEl.value = task.title;
-    descriptionEl.value = task.description;
-    startEl.value = task.start;
-    endEl.value = task.end;
-  } else {
-    editMode = false;
-    clearForm();
-  }
-}
-
-function closeEditor() {
-  popup.style.display = 'none';
-  clearForm();
-}
-
-function saveTask() {
-  const title = titleEl.value;
-  const description = descriptionEl.value;
-  const start = formatTime(startEl.value);
-  const end = formatTime(endEl.value);
-
-  const task = createTask(title, description, start, end);
-
-  if (editMode) {
-    updateTask(currentTaskElement, task);
-  } else {
-    addTask(task);
+  function createTask(title, description, start, end) {
+    return { title, description, start, end };
   }
 
-  closeEditor();
-}
+  function formatTaskHTML(task) {
+    return `
+      <div class="task">
+        <div class="task-operations">
+          <div class="input-div">
+            <input type="checkbox" class="checkbox">
+          </div>
+          <div class="title">
+            <span>${task.title}</span>
+            <button class="edit-task" title="Edit Task">✏️</button>
+          </div>
+        </div>
+        <div class="description">
+          <p>${task.description}</p>
+        </div>
+        <div class="time">
+          <p>🕐 ${task.start} - ${task.end}</p>
+        </div>
+      </div>`;
+  }
 
-// =============================
-// Checkbox Button Toggle Logic
-// =============================
+  function addTask(task) {
+    tasks.push(task);
 
-function bindCheckboxToggles() {
-  const checkboxes = document.querySelectorAll('.checkbox');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = formatTaskHTML(task);
+    const taskElement = wrapper.firstElementChild;
 
-  function toggleButton(btn) {
-    function update() {
-      const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-      btn.style.opacity = anyChecked ? 1 : 0.5;
-      btn.style.pointerEvents = anyChecked ? 'auto' : 'none';
-    }
-
-    checkboxes.forEach(cb => {
-      cb.removeEventListener('change', update);
-      cb.addEventListener('change', update);
+    taskElement.querySelector('.edit-task').addEventListener('click', () => {
+      openEditor("Edit Task", taskElement);
     });
 
-    update();
+    main.appendChild(taskElement);
+    bindCheckboxToggles();
   }
 
-  toggleButton(checkBtn);
-  toggleButton(deleteBtn);
-}
+  function updateTask(taskEl, updatedTask) {
+    taskEl.querySelector('.title span').innerText = updatedTask.title;
+    taskEl.querySelector('.description p').innerText = updatedTask.description;
+    taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
+    bindCheckboxToggles();
+  }
 
-// =============================
-// Event Binding (Startup)
-// =============================
+  function getTaskFromElement(el) {
+    const title = el.querySelector('.title span').innerText;
+    const description = el.querySelector('.description p').innerText;
+    const timeText = el.querySelector('.time p').innerText.replace('🕐 ', '');
+    const [start, end] = timeText.split(' - ');
+    return createTask(title, description, start, end);
+  }
 
-addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
-cancelBtn.addEventListener('click', closeEditor);
-saveBtn.addEventListener('click', saveTask);
+  // =============================
+  // Popup / Editor Logic
+  // =============================
 
-// You can now use addTask(createTask(...)) to populate tasks if needed.
+  function clearForm() {
+    titleEl.value = '';
+    descriptionEl.value = '';
+    startEl.value = '';
+    endEl.value = '';
+  }
+
+  function openEditor(title = "Add Task", taskElement = null) {
+    document.querySelector('.popup-title').innerText = title;
+    popup.style.display = 'flex';
+
+    if (taskElement) {
+      editMode = true;
+      currentTaskElement = taskElement;
+      const task = getTaskFromElement(taskElement);
+      titleEl.value = task.title;
+      descriptionEl.value = task.description;
+      startEl.value = task.start;
+      endEl.value = task.end;
+    } else {
+      editMode = false;
+      clearForm();
+    }
+  }
+
+  function closeEditor() {
+    popup.style.display = 'none';
+    clearForm();
+  }
+
+  function saveTask() {
+    const title = titleEl.value;
+    const description = descriptionEl.value;
+    const start = formatTime(startEl.value);
+    const end = formatTime(endEl.value);
+
+    const task = createTask(title, description, start, end);
+
+    if (editMode) {
+      updateTask(currentTaskElement, task);
+    } else {
+      addTask(task);
+    }
+
+    closeEditor();
+  }
+
+  // =============================
+  // Checkbox Button Toggle Logic
+  // =============================
+
+  function bindCheckboxToggles() {
+    const checkboxes = document.querySelectorAll('.checkbox');
+
+    function toggleButton(btn) {
+      function update() {
+        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+        btn.style.opacity = anyChecked ? 1 : 0.5;
+        btn.style.pointerEvents = anyChecked ? 'auto' : 'none';
+      }
+
+      checkboxes.forEach(cb => {
+        cb.removeEventListener('change', update);
+        cb.addEventListener('change', update);
+      });
+
+      update();
+    }
+
+    toggleButton(checkBtn);
+    toggleButton(deleteBtn);
+  }
+
+  // =============================
+  // Event Binding (Startup)
+  // =============================
+
+  addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
+  cancelBtn.addEventListener('click', closeEditor);
+  saveBtn.addEventListener('click', saveTask);
+
+  // Initialize checkbox toggles
+  bindCheckboxToggles();
+});
 
 
 
