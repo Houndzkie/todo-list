@@ -33,7 +33,37 @@ document.addEventListener('DOMContentLoaded', () => {
   // =============================
 
   function createTask(title, description, start, end) {
-    return { title, description, start, end };
+    return { title, description, start, end, completed: false };
+  }
+
+  function showActiveTasks() {
+    const tasks = document.querySelectorAll('.task');
+    tasks.forEach(task => {
+      if (!task.classList.contains('completed')) {
+        task.style.display = 'flex';
+      } else {
+        task.style.display = 'none';
+      }
+    });
+    
+    // Update button styles
+    document.querySelector('.active-task').style.opacity = '1';
+    document.querySelector('.completed-task').style.opacity = '0.5';
+  }
+
+  function showCompletedTasks() {
+    const tasks = document.querySelectorAll('.task');
+    tasks.forEach(task => {
+      if (task.classList.contains('completed')) {
+        task.style.display = 'flex';
+      } else {
+        task.style.display = 'none';
+      }
+    });
+    
+    // Update button styles
+    document.querySelector('.active-task').style.opacity = '0.5';
+    document.querySelector('.completed-task').style.opacity = '1';
   }
 
   function deleteSelectedTasks() {
@@ -56,16 +86,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function completeSelectedTasks() {
+    const checkboxes = document.querySelectorAll('.checkbox:checked');
+    checkboxes.forEach(checkbox => {
+      const taskElement = checkbox.closest('.task');
+      if (taskElement) {
+        taskElement.classList.add('completed');
+        
+        // Update the task's completed status
+        const taskIndex = tasks.findIndex(t => 
+          t.title === taskElement.querySelector('.title span').innerText
+        );
+        if (taskIndex !== -1) {
+          tasks[taskIndex].completed = true;
+        }
+
+        // If we're in active tasks view, hide the completed task
+        if (document.querySelector('.active-task').style.opacity === '1') {
+          taskElement.style.display = 'none';
+        }
+
+        // Disable the checkbox and edit button
+        checkbox.disabled = true;
+        taskElement.querySelector('.edit-task').disabled = true;
+
+        // Uncheck the checkbox
+        checkbox.checked = false;
+      }
+    });
+    
+    // Update button states
+    bindCheckboxToggles();
+  }
+
   function formatTaskHTML(task) {
     return `
-      <div class="task">
+      <div class="task ${task.completed ? 'completed' : ''}">
         <div class="task-operations">
           <div class="input-div">
-            <input type="checkbox" class="checkbox">
+            <input type="checkbox" class="checkbox" ${task.completed ? 'disabled' : ''}>
           </div>
           <div class="title">
             <span>${task.title}</span>
-            <button class="edit-task" title="Edit Task">✏️</button>
+            <button class="edit-task" title="Edit Task" ${task.completed ? 'disabled' : ''}>✏️</button>
           </div>
         </div>
         <div class="description">
@@ -88,7 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
       openEditor("Edit Task", taskElement);
     });
 
+    // Add to main and show/hide based on current view
     main.appendChild(taskElement);
+    
+    // If we're in completed tasks view, hide the new task
+    if (document.querySelector('.completed-task').style.opacity === '1') {
+      taskElement.style.display = 'none';
+    }
+
     bindCheckboxToggles();
   }
 
@@ -235,9 +305,15 @@ document.addEventListener('DOMContentLoaded', () => {
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
   deleteBtn.addEventListener('click', deleteSelectedTasks);
+  checkBtn.addEventListener('click', completeSelectedTasks);
+  
+  // Add event listeners for status buttons
+  document.querySelector('.active-task').addEventListener('click', showActiveTasks);
+  document.querySelector('.completed-task').addEventListener('click', showCompletedTasks);
 
-  // Initialize checkbox toggles
+  // Initialize checkbox toggles and show active tasks by default
   bindCheckboxToggles();
+  showActiveTasks();
 });
 
 

@@ -80,7 +80,7 @@ main {
   transition: all 0.2s ease;
 }
 
-.active-task:hover, .completed-task:hover,  .check-task:hover, .delete-task:hover, .add-task:hover {
+.active-task:hover, .completed-task:hover, .check-task:hover, .delete-task:hover, .add-task:hover {
   transform: scale(1.01);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -123,14 +123,6 @@ main {
   background: linear-gradient(135deg, #facc15, #eab308);
 }
 
-.title {
-  font-size: 20px;
-  font-weight: bold;
-  gap: 
-}
-
-
-
 .task {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
@@ -167,6 +159,7 @@ main {
   width: 80%;
   overflow: hidden;
   align-items: center;
+  font-weight: bold;
 }
 
 .title span {
@@ -223,4 +216,44 @@ main {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.task.completed {
+  opacity: 0.7;
+  background-color: #f8fafc;
+}
+
+.task.completed .title span {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.task.completed .description {
+  color: #94a3b8;
+}
+
+.task.completed .time {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.task.completed .checkbox:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.task.completed .edit-task:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.task.completed {
+  opacity: 0.7;
+  background-color: #f8fafc;
+  pointer-events: none;
+}
+
+.task.completed .task-operations {
+  pointer-events: none;
 }
