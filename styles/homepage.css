@@ -34,35 +34,96 @@ main {
 }
 
 @media (max-width: 699px) {
+  body {
+    padding: 1rem;
+  }
+
   main {
     grid-template-columns: 1fr;
+    padding: 15px;
+    min-height: calc(100vh - 120px);
   }
 
   header {
     justify-content: center;
     row-gap: 20px;
+    padding: 15px;
   }
 
   .status, .operations {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 15px;
+  }
+
+  .active-task, .completed-task, .add-task {
+    width: 150px;
+    font-size: 16px;
+  }
+
+  .check-task, .delete-task {
+    width: 50px;
+    height: 50px;
+  }
+
+  .task {
+    height: auto;
+    min-height: 200px;
+  }
+
+  .description {
+    height: auto;
+    min-height: 120px;
   }
 }
 
 @media (min-width: 700px) and (max-width: 1200px) {
+  body {
+    padding: 1.5rem;
+  }
+
   main {
     grid-template-columns: 1fr 1fr;
+    padding: 20px;
   }
 
   header {
     justify-content: center;
     row-gap: 20px;
+    padding: 20px 50px;
+  }
+
+  .status, .operations {
+    gap: 20px;
   }
 }
 
 @media (min-width: 1600px) {
+  body {
+    padding: 2.5rem;
+  }
+
   main {
     grid-template-columns: 1fr 1fr 1fr 1fr;
+    padding: 30px;
+  }
+
+  header {
+    padding: 25px 120px;
+  }
+
+  .status, .operations {
+    gap: 35px;
+  }
+
+  .active-task, .completed-task, .add-task {
+    width: 200px;
+    font-size: 22px;
+  }
+
+  .check-task, .delete-task {
+    width: 80px;
+    height: 80px;
   }
 }
 
