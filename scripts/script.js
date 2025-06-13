@@ -36,6 +36,26 @@ document.addEventListener('DOMContentLoaded', () => {
     return { title, description, start, end };
   }
 
+  function deleteSelectedTasks() {
+    const checkboxes = document.querySelectorAll('.checkbox:checked');
+    checkboxes.forEach(checkbox => {
+      const taskElement = checkbox.closest('.task');
+      if (taskElement) {
+        // Add fade-out animation
+        taskElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        taskElement.style.opacity = '0';
+        taskElement.style.transform = 'scale(0.95)';
+        
+        // Remove the element after animation
+        setTimeout(() => {
+          taskElement.remove();
+          // Update button states after deletion
+          bindCheckboxToggles();
+        }, 300);
+      }
+    });
+  }
+
   function formatTaskHTML(task) {
     return `
       <div class="task">
@@ -214,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
   addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
+  deleteBtn.addEventListener('click', deleteSelectedTasks);
 
   // Initialize checkbox toggles
   bindCheckboxToggles();
