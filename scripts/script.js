@@ -122,11 +122,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveTask() {
-    const title = titleEl.value;
-    const description = descriptionEl.value;
+    const title = titleEl.value.trim();
+    const description = descriptionEl.value.trim();
     const startTime = startEl.value;
     const endTime = endEl.value;
-    const errorMessage = document.querySelector('.error-message');
+    
+    // Get all error message elements
+    const timeError = document.querySelector('.error-message');
+    const titleError = document.querySelector('.title-error');
+    const descriptionError = document.querySelector('.description-error');
+    
+    // Reset all error messages
+    timeError.style.display = 'none';
+    titleError.style.display = 'none';
+    descriptionError.style.display = 'none';
+    
+    // Validate required fields
+    let hasError = false;
+    
+    if (!title) {
+      titleError.style.display = 'block';
+      hasError = true;
+    }
+    
+    if (!description) {
+      descriptionError.style.display = 'block';
+      hasError = true;
+    }
 
     // Convert times to comparable values (minutes since midnight)
     const [startHour, startMinute] = startTime.split(':').map(Number);
@@ -136,12 +158,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Validate time
     if (startTotalMinutes >= endTotalMinutes) {
-      errorMessage.style.display = 'block';
-      return;
+      timeError.style.display = 'block';
+      hasError = true;
     }
 
-    // Hide error message if it was previously shown
-    errorMessage.style.display = 'none';
+    // If there are any errors, don't save
+    if (hasError) {
+      return;
+    }
 
     const start = formatTime(startTime);
     const end = formatTime(endTime);
