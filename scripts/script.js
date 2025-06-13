@@ -124,8 +124,27 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveTask() {
     const title = titleEl.value;
     const description = descriptionEl.value;
-    const start = formatTime(startEl.value);
-    const end = formatTime(endEl.value);
+    const startTime = startEl.value;
+    const endTime = endEl.value;
+    const errorMessage = document.querySelector('.error-message');
+
+    // Convert times to comparable values (minutes since midnight)
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+    const startTotalMinutes = startHour * 60 + startMinute;
+    const endTotalMinutes = endHour * 60 + endMinute;
+
+    // Validate time
+    if (startTotalMinutes >= endTotalMinutes) {
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    // Hide error message if it was previously shown
+    errorMessage.style.display = 'none';
+
+    const start = formatTime(startTime);
+    const end = formatTime(endTime);
 
     const task = createTask(title, description, start, end);
 
