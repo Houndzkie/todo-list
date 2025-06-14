@@ -269,6 +269,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     closeEditor();
+
+    // Save tasks to localStorage
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
   // =============================
@@ -314,4 +317,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize checkbox toggles and show active tasks by default
   bindCheckboxToggles();
   showActiveTasks();
+
+  // Load saved tasks from localStorage
+  const savedTasks = localStorage.getItem('tasks');
+  if (savedTasks) {
+    tasks = JSON.parse(savedTasks);
+    // Render saved tasks
+  }
 });
