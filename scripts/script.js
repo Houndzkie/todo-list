@@ -1,15 +1,11 @@
-// Utility: Converts "14:30" -> "2:30 PM"
-function formatTime(time) {
-  const [hour, minute] = time.split(':').map(Number);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
-  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
-}
+import { createTask, formatTaskHTML, getTaskFromElement, formatTime } from './taskManager.js';
+import { showActiveTasks, showCompletedTasks, bindCheckboxToggles, clearForm, openEditor, closeEditor } from './uiManager.js';
+import { saveTasksToStorage, loadTasksFromStorage, renderSavedTasks } from './storageManager.js';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Data storage for all tasks
-  let tasks = [];
+  let tasks = loadTasksFromStorage();
 
   // Cached DOM elements
   const main = document.querySelector('main');
@@ -83,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Update button states after deletion
           bindCheckboxToggles();
           // Save to localStorage after deletion
-          localStorage.setItem('tasks', JSON.stringify(tasks));
+          saveTasksToStorage(tasks);
         }, 300);
       }
     });
@@ -120,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Update button states and save to localStorage
     bindCheckboxToggles();
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasksToStorage(tasks);
   }
 
   function formatTaskHTML(task) {
@@ -154,7 +150,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskElement = wrapper.firstElementChild;
 
     taskElement.querySelector('.edit-task').addEventListener('click', () => {
-      openEditor("Edit Task", taskElement);
+      const result = openEditor("Edit Task", taskElement);
+      editMode = result.editMode;
+      currentTaskElement = result.currentTaskElement;
     });
 
     // Add to main and show/hide based on current view
@@ -167,8 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     bindCheckboxToggles();
     // Save to localStorage after adding
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    console.log('Saved to localStorage:', localStorage.getItem('tasks'));
+    saveTasksToStorage(tasks);
   }
 
   function updateTask(taskEl, updatedTask) {
@@ -177,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
     bindCheckboxToggles();
     // Save to localStorage after updating
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    saveTasksToStorage(tasks);
   }
 
   function getTaskFromElement(el) {
@@ -316,7 +313,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event Binding (Startup)
   // =============================
 
-  addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
+  addTaskBtn.addEventListener('click', () => {
+    const result = openEditor("Add Task");
+    editMode = result.editMode;
+    currentTaskElement = result.currentTaskElement;
+  });
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
   deleteBtn.addEventListener('click', deleteSelectedTasks);
@@ -330,38 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCheckboxToggles();
   showActiveTasks();
 
-  // Load saved tasks from localStorage at the start
-  const savedTasks = localStorage.getItem('tasks');
-  if (savedTasks) {
-    tasks = JSON.parse(savedTasks);
-    // Render saved tasks
-    tasks.forEach(task => {
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = formatTaskHTML(task);
-      const taskElement = wrapper.firstElementChild;
-
-      // Set completed status and visibility
-      if (task.completed) {
-        taskElement.classList.add('completed');
-        const checkbox = taskElement.querySelector('.checkbox');
-        const editButton = taskElement.querySelector('.edit-task');
-        if (checkbox) checkbox.disabled = true;
-        if (editButton) editButton.disabled = true;
-      }
-
-      taskElement.querySelector('.edit-task').addEventListener('click', () => {
-        openEditor("Edit Task", taskElement);
-      });
-
-      main.appendChild(taskElement);
-      
-      // Set initial visibility based on current view and completed status
-      const isCompletedView = document.querySelector('.completed-task').style.opacity === '1';
-      if (isCompletedView) {
-        taskElement.style.display = task.completed ? 'flex' : 'none';
-      } else {
-        taskElement.style.display = task.completed ? 'none' : 'flex';
-      }
-    });
-  }
+  // Render saved tasks
+  renderSavedTasks(tasks, main);
 });
