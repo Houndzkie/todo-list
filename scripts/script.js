@@ -1,19 +1,15 @@
-import { createTask, formatTaskHTML, getTaskFromElement, formatTime } from './taskManager.js';
-import { showActiveTasks, showCompletedTasks, bindCheckboxToggles, clearForm, openEditor, closeEditor } from './uiManager.js';
-import { saveTasksToStorage, loadTasksFromStorage, renderSavedTasks } from './storageManager.js';
+// Utility: Converts "14:30" -> "2:30 PM"
+function formatTime(time) {
+  const [hour, minute] = time.split(':').map(Number);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
+}
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Data storage for tasks
-  let activeTasks = [];
-  let completedTasks = [];
-  const MAX_COMPLETED_TASKS = 9;
-
-  // Load saved tasks from localStorage
-  const savedActiveTasks = localStorage.getItem('activeTasks');
-  const savedCompletedTasks = localStorage.getItem('completedTasks');
-  if (savedActiveTasks) activeTasks = JSON.parse(savedActiveTasks);
-  if (savedCompletedTasks) completedTasks = JSON.parse(savedCompletedTasks);
+  // Data storage for all tasks
+  let tasks = [];
 
   // Cached DOM elements
   const main = document.querySelector('main');
@@ -76,15 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     checkboxes.forEach(checkbox => {
       const taskElement = checkbox.closest('.task');
       if (taskElement) {
-        const taskTitle = taskElement.querySelector('.title span').innerText;
-        
-        // Remove from appropriate array
-        if (taskElement.classList.contains('completed')) {
-          completedTasks = completedTasks.filter(t => t.title !== taskTitle);
-        } else {
-          activeTasks = activeTasks.filter(t => t.title !== taskTitle);
-        }
-
         // Add fade-out animation
         taskElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
         taskElement.style.opacity = '0';
@@ -93,8 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove the element after animation
         setTimeout(() => {
           taskElement.remove();
+          // Update button states after deletion
           bindCheckboxToggles();
-          saveTasksToStorage();
+          // Save to localStorage after deletion
+          localStorage.setItem('tasks', JSON.stringify(tasks));
         }, 300);
       }
     });
@@ -102,47 +91,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function completeSelectedTasks() {
     const checkboxes = document.querySelectorAll('.checkbox:checked');
-    
     checkboxes.forEach(checkbox => {
       const taskElement = checkbox.closest('.task');
       if (taskElement) {
-        const taskTitle = taskElement.querySelector('.title span').innerText;
-        const taskIndex = activeTasks.findIndex(t => t.title === taskTitle);
+        taskElement.classList.add('completed');
         
+        // Update the task's completed status
+        const taskIndex = tasks.findIndex(t => 
+          t.title === taskElement.querySelector('.title span').innerText
+        );
         if (taskIndex !== -1) {
-          // Get the task and remove it from active tasks
-          const completedTask = activeTasks.splice(taskIndex, 1)[0];
-          completedTask.completed = true;
-
-          // Add to completed tasks (at the beginning)
-          completedTasks.unshift(completedTask);
-
-          // If we have more than 9 completed tasks, remove the oldest one
-          if (completedTasks.length > MAX_COMPLETED_TASKS) {
-            completedTasks.pop(); // Remove the last (oldest) task
-          }
-
-          // Update the task element
-          taskElement.classList.add('completed');
-          
-          // If we're in active tasks view, hide the completed task
-          if (document.querySelector('.active-task').style.opacity === '1') {
-            taskElement.style.display = 'none';
-          }
-
-          // Disable the checkbox and edit button
-          checkbox.disabled = true;
-          taskElement.querySelector('.edit-task').disabled = true;
-
-          // Uncheck the checkbox
-          checkbox.checked = false;
+          tasks[taskIndex].completed = true;
         }
+
+        // If we're in active tasks view, hide the completed task
+        if (document.querySelector('.active-task').style.opacity === '1') {
+          taskElement.style.display = 'none';
+        }
+
+        // Disable the checkbox and edit button
+        checkbox.disabled = true;
+        taskElement.querySelector('.edit-task').disabled = true;
+
+        // Uncheck the checkbox
+        checkbox.checked = false;
       }
     });
     
     // Update button states and save to localStorage
     bindCheckboxToggles();
-    saveTasksToStorage();
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
   function formatTaskHTML(task) {
@@ -167,80 +145,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addTask(task) {
-    // Check if we're at the limit for active tasks
-    if (activeTasks.length >= 15) {
-      // Show error message in the website
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message';
-      errorDiv.style.display = 'block';
-      errorDiv.style.color = '#dc2626';
-      errorDiv.style.textAlign = 'center';
-      errorDiv.style.marginTop = '10px';
-      errorDiv.style.position = 'fixed';
-      errorDiv.style.top = '20px';
-      errorDiv.style.left = '50%';
-      errorDiv.style.transform = 'translateX(-50%)';
-      errorDiv.style.backgroundColor = 'white';
-      errorDiv.style.padding = '10px 20px';
-      errorDiv.style.borderRadius = '5px';
-      errorDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-      errorDiv.style.zIndex = '1000';
-      errorDiv.textContent = 'Maximum limit of 15 active tasks reached!';
-      
-      document.body.appendChild(errorDiv);
-      
-      setTimeout(() => {
-        errorDiv.remove();
-      }, 3000);
-      
-      return;
-    }
-
-    activeTasks.push(task);
+    console.log('Before pushing task:', tasks);
+    tasks.push(task);
+    console.log('After pushing task:', tasks);
 
     const wrapper = document.createElement('div');
     wrapper.innerHTML = formatTaskHTML(task);
     const taskElement = wrapper.firstElementChild;
 
     taskElement.querySelector('.edit-task').addEventListener('click', () => {
-      const result = openEditor("Edit Task", taskElement);
-      editMode = result.editMode;
-      currentTaskElement = result.currentTaskElement;
+      openEditor("Edit Task", taskElement);
     });
 
+    // Add to main and show/hide based on current view
     main.appendChild(taskElement);
     
+    // If we're in completed tasks view, hide the new task
     if (document.querySelector('.completed-task').style.opacity === '1') {
       taskElement.style.display = 'none';
     }
 
     bindCheckboxToggles();
-    saveTasksToStorage();
+    // Save to localStorage after adding
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    console.log('Saved to localStorage:', localStorage.getItem('tasks'));
   }
 
   function updateTask(taskEl, updatedTask) {
-    const taskTitle = taskEl.querySelector('.title span').innerText;
-    const isCompleted = taskEl.classList.contains('completed');
-    
-    // Update the task in the appropriate array
-    if (isCompleted) {
-      const index = completedTasks.findIndex(t => t.title === taskTitle);
-      if (index !== -1) {
-        completedTasks[index] = updatedTask;
-      }
-    } else {
-      const index = activeTasks.findIndex(t => t.title === taskTitle);
-      if (index !== -1) {
-        activeTasks[index] = updatedTask;
-      }
-    }
-
     taskEl.querySelector('.title span').innerText = updatedTask.title;
     taskEl.querySelector('.description p').innerText = updatedTask.description;
     taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
-    
     bindCheckboxToggles();
-    saveTasksToStorage();
+    // Save to localStorage after updating
+    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
   function getTaskFromElement(el) {
@@ -294,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Saving task with values:', { title, description, startTime, endTime });
     
     // Get all error message elements
-    const timeError = document.querySelector('.form-group:last-child .error-message');
+    const timeError = document.querySelector('.error-message');
     const titleError = document.querySelector('.title-error');
     const descriptionError = document.querySelector('.description-error');
     
@@ -354,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // =============================
 
   function bindCheckboxToggles() {
-    const checkboxes = document.querySelectorAll('.checkbox:not([disabled])');
+    const checkboxes = document.querySelectorAll('.checkbox');
 
     function toggleButton(btn) {
       function update() {
@@ -379,43 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event Binding (Startup)
   // =============================
 
-  addTaskBtn.addEventListener('click', () => {
-    // Check if we're at the limit for active tasks
-    const activeTasks = document.querySelectorAll('.task').length;
-    if (activeTasks >= 15) {
-      // Show error message in the website
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message';
-      errorDiv.style.display = 'block';
-      errorDiv.style.color = '#dc2626';
-      errorDiv.style.textAlign = 'center';
-      errorDiv.style.marginTop = '10px';
-      errorDiv.style.position = 'fixed';
-      errorDiv.style.top = '20px';
-      errorDiv.style.left = '50%';
-      errorDiv.style.transform = 'translateX(-50%)';
-      errorDiv.style.backgroundColor = 'white';
-      errorDiv.style.padding = '10px 20px';
-      errorDiv.style.borderRadius = '5px';
-      errorDiv.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-      errorDiv.style.zIndex = '1000';
-      errorDiv.textContent = 'Maximum limit of 15 active tasks reached!';
-      
-      // Add error message to body
-      document.body.appendChild(errorDiv);
-      
-      // Remove error message after 3 seconds
-      setTimeout(() => {
-        errorDiv.remove();
-      }, 3000);
-      
-      return;
-    }
-
-    const result = openEditor("Add Task");
-    editMode = result.editMode;
-    currentTaskElement = result.currentTaskElement;
-  });
+  addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
   deleteBtn.addEventListener('click', deleteSelectedTasks);
@@ -429,55 +330,38 @@ document.addEventListener('DOMContentLoaded', () => {
   bindCheckboxToggles();
   showActiveTasks();
 
-  // Render saved tasks
-  renderSavedTasks(activeTasks.concat(completedTasks), main);
-
-  // Initial render of tasks
-  function renderTasks() {
-    // Clear main container
-    main.innerHTML = '';
-
-    // Render active tasks
-    activeTasks.forEach(task => {
+  // Load saved tasks from localStorage at the start
+  const savedTasks = localStorage.getItem('tasks');
+  if (savedTasks) {
+    tasks = JSON.parse(savedTasks);
+    // Render saved tasks
+    tasks.forEach(task => {
       const wrapper = document.createElement('div');
       wrapper.innerHTML = formatTaskHTML(task);
       const taskElement = wrapper.firstElementChild;
-      
+
+      // Set completed status and visibility
+      if (task.completed) {
+        taskElement.classList.add('completed');
+        const checkbox = taskElement.querySelector('.checkbox');
+        const editButton = taskElement.querySelector('.edit-task');
+        if (checkbox) checkbox.disabled = true;
+        if (editButton) editButton.disabled = true;
+      }
+
       taskElement.querySelector('.edit-task').addEventListener('click', () => {
-        const result = openEditor("Edit Task", taskElement);
-        editMode = result.editMode;
-        currentTaskElement = result.currentTaskElement;
+        openEditor("Edit Task", taskElement);
       });
 
       main.appendChild(taskElement);
-    });
-
-    // Render only the 9 most recent completed tasks
-    const recentCompletedTasks = completedTasks.slice(0, 9);
-    recentCompletedTasks.forEach(task => {
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = formatTaskHTML(task);
-      const taskElement = wrapper.firstElementChild;
       
-      taskElement.classList.add('completed');
-      const checkbox = taskElement.querySelector('.checkbox');
-      const editButton = taskElement.querySelector('.edit-task');
-      if (checkbox) checkbox.disabled = true;
-      if (editButton) editButton.disabled = true;
-
-      taskElement.querySelector('.edit-task').addEventListener('click', () => {
-        const result = openEditor("Edit Task", taskElement);
-        editMode = result.editMode;
-        currentTaskElement = result.currentTaskElement;
-      });
-
-      main.appendChild(taskElement);
+      // Set initial visibility based on current view and completed status
+      const isCompletedView = document.querySelector('.completed-task').style.opacity === '1';
+      if (isCompletedView) {
+        taskElement.style.display = task.completed ? 'flex' : 'none';
+      } else {
+        taskElement.style.display = task.completed ? 'none' : 'flex';
+      }
     });
-
-    // Set initial visibility
-    showActiveTasks();
   }
-
-  // Initial render
-  renderTasks();
 });
