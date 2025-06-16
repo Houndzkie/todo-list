@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Saving task with values:', { title, description, startTime, endTime });
     
     // Get all error message elements
-    const timeError = document.querySelector('.error-message');
+    const timeError = document.querySelector('.form-group:last-child .error-message');
     const titleError = document.querySelector('.title-error');
     const descriptionError = document.querySelector('.description-error');
     
