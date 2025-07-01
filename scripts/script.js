@@ -9,7 +9,8 @@ function formatTime(time) {
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Data storage for all tasks
-  let tasks = [];
+  let activeTasks = [];
+  let completedTasks = [];
 
   // Cached DOM elements
   const main = document.querySelector('main');
@@ -82,8 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
           taskElement.remove();
           // Update button states after deletion
           bindCheckboxToggles();
-          // Save to localStorage after deletion
-          localStorage.setItem('tasks', JSON.stringify(tasks));
         }, 300);
       }
     });
@@ -120,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Update button states and save to localStorage
     bindCheckboxToggles();
-    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
   function formatTaskHTML(task) {
@@ -145,9 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addTask(task) {
-    console.log('Before pushing task:', tasks);
-    tasks.push(task);
-    console.log('After pushing task:', tasks);
+    console.log('Before pushing task:', activeTasks);
+    activeTasks.push(task);
+    console.log('After pushing task:', activeTasks);
 
     const wrapper = document.createElement('div');
     wrapper.innerHTML = formatTaskHTML(task);
@@ -166,9 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     bindCheckboxToggles();
-    // Save to localStorage after adding
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    console.log('Saved to localStorage:', localStorage.getItem('tasks'));
   }
 
   function updateTask(taskEl, updatedTask) {
@@ -176,8 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
     taskEl.querySelector('.description p').innerText = updatedTask.description;
     taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
     bindCheckboxToggles();
-    // Save to localStorage after updating
-    localStorage.setItem('tasks', JSON.stringify(tasks));
   }
 
   function getTaskFromElement(el) {
@@ -231,9 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Saving task with values:', { title, description, startTime, endTime });
     
     // Get all error message elements
-    const timeError = document.querySelector('.error-message');
     const titleError = document.querySelector('.title-error');
     const descriptionError = document.querySelector('.description-error');
+    const timeError = document.querySelector('.time-error');
     
     // Reset all error messages
     timeError.style.display = 'none';
@@ -329,39 +322,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize checkbox toggles and show active tasks by default
   bindCheckboxToggles();
   showActiveTasks();
-
-  // Load saved tasks from localStorage at the start
-  const savedTasks = localStorage.getItem('tasks');
-  if (savedTasks) {
-    tasks = JSON.parse(savedTasks);
-    // Render saved tasks
-    tasks.forEach(task => {
-      const wrapper = document.createElement('div');
-      wrapper.innerHTML = formatTaskHTML(task);
-      const taskElement = wrapper.firstElementChild;
-
-      // Set completed status and visibility
-      if (task.completed) {
-        taskElement.classList.add('completed');
-        const checkbox = taskElement.querySelector('.checkbox');
-        const editButton = taskElement.querySelector('.edit-task');
-        if (checkbox) checkbox.disabled = true;
-        if (editButton) editButton.disabled = true;
-      }
-
-      taskElement.querySelector('.edit-task').addEventListener('click', () => {
-        openEditor("Edit Task", taskElement);
-      });
-
-      main.appendChild(taskElement);
-      
-      // Set initial visibility based on current view and completed status
-      const isCompletedView = document.querySelector('.completed-task').style.opacity === '1';
-      if (isCompletedView) {
-        taskElement.style.display = task.completed ? 'flex' : 'none';
-      } else {
-        taskElement.style.display = task.completed ? 'none' : 'flex';
-      }
-    });
-  }
 });
