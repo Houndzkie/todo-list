@@ -1,5 +1,4 @@
 // format time
-
 function formatTime(time) {
   const [hour, minute] = time.split(':').map(Number);
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -13,9 +12,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeTasks = [];
   let completedTasks = [];
 
-  // html elements
+  // HTML elements
   const main = document.querySelector('main');
   const popup = document.querySelector('.popup-container');
+  const taskTitle = document.querySelector('#taskTitle');
+  const taskDescription = document.querySelector('#taskDescription');
+  const startTime = document.querySelector('#start-time');
+  const endTime = document.querySelector('#end-time');
+  const saveBtn = document.querySelector('.save-btn');
+  const cancelBtn = document.querySelector('.cancel-btn');
+  const checkBtn = document.querySelector('.check-task');
+  const deleteBtn = document.querySelector('.delete-task');
+  const addBtn = document.querySelector('.add-task');
 
   // editor state
   let editMode = false;
@@ -52,4 +60,26 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </div>`;
   }
+
+  function addTask(task) {
+    openEditor("Add Task", task);
+  }
+
+  function deleteTask() {
+
+  }
+
+  function openEditor() {
+
+  }
+
+  function closeEditor() {
+    
+  }
+
+  // add event listeners
+  addBtn.addEventListener('click', addTask);
+  deleteBtn.addEventListener('click', deleteTask);
+  checkBtn.addEventListener('click', completeTask);
+  cancelBtn.addEventListeter('click', closeEditor);
 });
