@@ -83,8 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
   }
 
-  function openEditor() {
+  function openEditor(title) {
     popup.style.display = 'flex';
+    popup.querySelector('.popup-title').textContent = title;
   }
 
   function closeEditor() {
