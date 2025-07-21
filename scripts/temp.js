@@ -62,8 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>`;
   }
 
-  function addTask(task) {
+  function addTask() {
     openEditor("Add Task");
+
+    saveBtn.addEventListener('click', saveTask);
   }
 
   function editTask() {
@@ -75,9 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveTask() {
+    const wrapper = document.createElement('div');
+    const task = createTaskObject(taskTitle.value, taskDescription.value, formatTime(startTime.value), formatTime(endTime.value));
+    wrapper.innerHTML = formatTaskHTML(task);
+    const taskElement = wrapper.firstElementChild;
 
+    main.appendChild(taskElement);
 
-    closeEditor();
+    activeTasks.push(task);
   }
 
   function completeTask() {
@@ -105,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   addBtn.addEventListener('click', addTask);
   deleteBtn.addEventListener('click', deleteTask);
   checkBtn.addEventListener('click', completeTask);
-  saveBtn.addEventListener('click', saveTask);
-  cancelBtn.addEventListeter('click', closeEditor);
+  cancelBtn.addEventListener('click', closeEditor);
+  saveBtn.addEventListener('click', closeEditor);
   checkbox.addEventListener('click', editTask);
 });
