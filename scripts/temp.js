@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const checkBtn = document.querySelector('.check-task');
   const deleteBtn = document.querySelector('.delete-task');
   const addBtn = document.querySelector('.add-task');
+  const checkbox = document.querySelector('.checkbox');
 
   // editor state
   let editMode = false;
@@ -106,4 +107,5 @@ document.addEventListener('DOMContentLoaded', () => {
   checkBtn.addEventListener('click', completeTask);
   saveBtn.addEventListener('click', saveTask);
   cancelBtn.addEventListeter('click', closeEditor);
+  checkbox.addEventListener('click', editTask);
 });
