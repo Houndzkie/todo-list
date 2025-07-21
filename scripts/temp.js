@@ -63,9 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addTask() {
+    clearForm();
     openEditor("Add Task");
-
-    saveBtn.addEventListener('click', saveTask);
   }
 
   function editTask() {
@@ -85,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
     main.appendChild(taskElement);
 
     activeTasks.push(task);
+
+    closeEditor();
   }
 
   function completeTask() {
@@ -113,6 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
   deleteBtn.addEventListener('click', deleteTask);
   checkBtn.addEventListener('click', completeTask);
   cancelBtn.addEventListener('click', closeEditor);
-  saveBtn.addEventListener('click', closeEditor);
+  saveBtn.addEventListener('click', saveTask);
   checkbox.addEventListener('click', editTask);
 });
