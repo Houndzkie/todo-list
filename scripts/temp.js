@@ -62,24 +62,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function addTask(task) {
-    openEditor("Add Task", task);
+    openEditor("Add Task");
+  }
+
+  function editTask() {
+    openEditor("Edit Task");
   }
 
   function deleteTask() {
 
   }
 
-  function openEditor() {
+  function saveTask() {
 
+
+    closeEditor();
+  }
+
+  function completeTask() {
+    
+  }
+
+  function openEditor() {
+    popup.style.display = 'flex';
   }
 
   function closeEditor() {
-    
+    popup.style.display = 'none';
+    clearForm();
+  }
+
+  function clearForm() {
+    taskTitle.value = '';
+    taskDescription.value = '';
+    startTime.value = '';
+    endTime.value = '';
   }
 
   // add event listeners
   addBtn.addEventListener('click', addTask);
   deleteBtn.addEventListener('click', deleteTask);
   checkBtn.addEventListener('click', completeTask);
+  saveBtn.addEventListener('click', saveTask);
   cancelBtn.addEventListeter('click', closeEditor);
 });
