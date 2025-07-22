@@ -94,7 +94,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function deleteTask() {
-
+    const checkedBoxes = document.querySelectorAll('.task .checkbox:checked');
+  
+    checkedBoxes.forEach(cb => {
+      const taskEl = cb.closest('.task');
+      const taskId = taskEl.dataset.id;
+  
+      // Remove from activeTasks
+      const taskIndex = activeTasks.findIndex(t => t.id === taskId);
+      if (taskIndex !== -1) {
+        activeTasks.splice(taskIndex, 1);
+      }
+  
+      // Remove from DOM
+      taskEl.remove();
+    });
+  
+    toggleButtons(); // Disable buttons again if no tasks are selected
   }
 
   function saveTask() {
@@ -144,8 +160,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function completeTask() {
-    
-  }
+  const checkedBoxes = document.querySelectorAll('.task .checkbox:checked');
+
+  checkedBoxes.forEach(cb => {
+    const taskEl = cb.closest('.task');
+    const taskId = taskEl.dataset.id;
+
+    // Find index in activeTasks
+    const taskIndex = activeTasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+      // Remove from activeTasks and mark completed
+      const [task] = activeTasks.splice(taskIndex, 1);
+      task.completed = true;
+
+      // Add to completedTasks
+      completedTasks.push(task);
+
+      // Update DOM
+      taskEl.classList.add('completed');
+      cb.disabled = true;
+      const editBtn = taskEl.querySelector('.edit-task');
+      if (editBtn) editBtn.disabled = true;
+    }
+  });
+
+  toggleButtons(); // Re-disable buttons after action
+}
 
   function openEditor(title) {
     popup.style.display = 'flex';
