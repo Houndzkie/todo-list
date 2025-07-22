@@ -167,6 +167,7 @@ main {
   width: 70px;
   height: 70px;
   opacity: 0.5;
+  cursor: default;
 }
 
 .check-task, .delete-task, .add-task {

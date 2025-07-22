@@ -251,11 +251,15 @@ document.addEventListener('DOMContentLoaded', () => {
       deleteBtn.disabled = false;
       checkBtn.style.opacity = 1;
       deleteBtn.style.opacity = 1;
+      checkBtn.style.cursor = 'pointer';
+      deleteBtn.style.cursor = 'pointer';
     } else {
       checkBtn.disabled = true;
       deleteBtn.disabled = true;
       checkBtn.style.opacity = 0.5;
       deleteBtn.style.opacity = 0.5;
+      checkBtn.style.cursor = 'none';
+      deleteBtn.style.cursor = 'none';
     }
   }
 
