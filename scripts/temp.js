@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const deleteBtn = document.querySelector('.delete-task');
   const addBtn = document.querySelector('.add-task');
   const checkbox = document.querySelector('.checkbox');
+  const activeTasksBtn = document.querySelector('.active-task');
+  const completedTasksBtn = document.querySelector('.completed-task');
 
   // editor state
   let editMode = false;
