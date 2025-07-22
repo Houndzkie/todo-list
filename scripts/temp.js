@@ -6,6 +6,20 @@ function formatTime(time) {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
+function convertTo24(timeStr) {
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Data storage for al tasks
@@ -67,7 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
     openEditor("Add Task");
   }
 
-  function editTask() {
+  function editTask(taskElement, taskData) {
+    currentTaskElement = taskElement;
+    editMode = true;
+  
+    taskTitle.value = taskData.title;
+    taskDescription.value = taskData.description;
+    startTime.value = convertTo24(taskData.start);
+    endTime.value = convertTo24(taskData.end);
+  
     openEditor("Edit Task");
   }
 
@@ -76,16 +98,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveTask() {
-    const wrapper = document.createElement('div');
-    const task = createTaskObject(taskTitle.value, taskDescription.value, formatTime(startTime.value), formatTime(endTime.value));
-    wrapper.innerHTML = formatTaskHTML(task);
-    const taskElement = wrapper.firstElementChild;
-
-    main.appendChild(taskElement);
-
-    activeTasks.push(task);
-
+    if (!taskTitle.value.trim()) {
+      alert("Task title is required.");
+      return;
+    }
+  
+    const title = taskTitle.value;
+    const description = taskDescription.value;
+    const start = formatTime(startTime.value);
+    const end = formatTime(endTime.value);
+  
+    if (editMode && currentTaskElement) {
+      // 🔁 Editing an existing task
+      const taskId = currentTaskElement.dataset.id;
+      const task = activeTasks.find(t => t.id === taskId);
+      if (!task) return;
+  
+      // Update task data
+      task.title = title;
+      task.description = description;
+      task.start = start;
+      task.end = end;
+  
+      // Update DOM
+      currentTaskElement.querySelector('.title span').textContent = title;
+      currentTaskElement.querySelector('.description p').textContent = description;
+      currentTaskElement.querySelector('.time p').textContent = `🕐 ${start} - ${end}`;
+  
+    } else {
+      // ➕ Adding a new task
+      const task = createTaskObject(title, description, start, end);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = formatTaskHTML(task);
+      const taskElement = wrapper.firstElementChild;
+  
+      main.appendChild(taskElement);
+      activeTasks.push(task);
+    }
+  
     closeEditor();
+    editMode = false;
+    currentTaskElement = null;
+
+    console.log(activeTasks);
   }
 
   function completeTask() {
@@ -100,6 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeEditor() {
     popup.style.display = 'none';
     clearForm();
+    editMode = false;
+    currentTaskElement = null;
   }
 
   function clearForm() {
@@ -109,11 +166,43 @@ document.addEventListener('DOMContentLoaded', () => {
     endTime.value = '';
   }
 
+  function toggleButtons() {
+    const checkboxes = document.querySelectorAll('.task .checkbox');
+    const isAnyChecked = [...checkboxes].some(cb => cb.checked);
+
+    if (isAnyChecked) {
+      checkBtn.disabled = false;
+      deleteBtn.disabled = false;
+      checkBtn.style.opacity = 1;
+      deleteBtn.style.opacity = 1;
+    } else {
+      checkBtn.disabled = true;
+      deleteBtn.disabled = true;
+      checkBtn.style.opacity = 0.5;
+      deleteBtn.style.opacity = 0.5;
+    }
+  }
+
   // add event listeners
   addBtn.addEventListener('click', addTask);
   deleteBtn.addEventListener('click', deleteTask);
   checkBtn.addEventListener('click', completeTask);
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
-  checkbox.addEventListener('click', editTask);
+  // Handles clicks (like editing)
+  main.addEventListener('click', (e) => {
+    if (e.target.classList.contains('edit-task')) {
+      const taskEl = e.target.closest('.task');
+      const taskId = taskEl.dataset.id;
+      const taskData = activeTasks.find(t => t.id === taskId);
+      editTask(taskEl, taskData);
+    }
+  });
+
+  // Handles checkbox changes
+  main.addEventListener('change', (e) => {
+    if (e.target.classList.contains('checkbox')) {
+      toggleButtons();
+    }
+  });
 });
