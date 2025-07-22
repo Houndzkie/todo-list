@@ -29,7 +29,7 @@
 }
 
 .popup-body {
-  padding: 20px 30px;
+  padding: 20px 30px 20px 30px;
 }
 
 .popup-title {
@@ -45,11 +45,13 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  position: relative;
+  margin-bottom: 20px;
 }
 
 .form-input {
   border-radius: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   padding: 10px;
   font-size: 16px;
 }
@@ -109,7 +111,10 @@
 .error-message {
   color: #dc2626;
   font-size: 14px;
-  margin-top: -15px;
-  margin-bottom: 15px;
+  margin-top: 5px;
+  margin-bottom: 0;
   display: none;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
 }

@@ -114,36 +114,57 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function saveTask() {
-    if (!taskTitle.value.trim()) {
-      alert("Task title is required.");
+    const title = taskTitle.value.trim();
+    const description = taskDescription.value.trim();
+    const start = startTime.value;
+    const end = endTime.value;
+  
+    // Clear previous error messages
+    clearErrorMessages();
+  
+    // 1. Validate empty fields
+    if (!title || !description) {
+      if (!title) {
+        showError('title-error', 'Task title is required');
+      }
+      if (!description) {
+        showError('description-error', 'Task description is required');
+      }
       return;
     }
   
-    const title = taskTitle.value;
-    const description = taskDescription.value;
-    const start = formatTime(startTime.value);
-    const end = formatTime(endTime.value);
+    // 2. Validate time logic
+    if (!start || !end) {
+      showError('time-error', 'Start time and end time are required');
+      return;
+    }
+  
+    if (start >= end) {
+      showError('time-error', 'End time must be later than start time');
+      return;
+    }
+  
+    // 3. Continue if valid
+    const formattedStart = formatTime(start);
+    const formattedEnd = formatTime(end);
   
     if (editMode && currentTaskElement) {
-      // 🔁 Editing an existing task
+      // Editing existing task
       const taskId = currentTaskElement.dataset.id;
       const task = activeTasks.find(t => t.id === taskId);
       if (!task) return;
   
-      // Update task data
       task.title = title;
       task.description = description;
-      task.start = start;
-      task.end = end;
+      task.start = formattedStart;
+      task.end = formattedEnd;
   
-      // Update DOM
       currentTaskElement.querySelector('.title span').textContent = title;
       currentTaskElement.querySelector('.description p').textContent = description;
-      currentTaskElement.querySelector('.time p').textContent = `🕐 ${start} - ${end}`;
-  
+      currentTaskElement.querySelector('.time p').textContent = `🕐 ${formattedStart} - ${formattedEnd}`;
     } else {
-      // ➕ Adding a new task
-      const task = createTaskObject(title, description, start, end);
+      // Creating new task
+      const task = createTaskObject(title, description, formattedStart, formattedEnd);
       const wrapper = document.createElement('div');
       wrapper.innerHTML = formatTaskHTML(task);
       const taskElement = wrapper.firstElementChild;
@@ -153,8 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     closeEditor();
-    editMode = false;
-    currentTaskElement = null;
 
     console.log(activeTasks);
   }
@@ -190,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function openEditor(title) {
     popup.style.display = 'flex';
     popup.querySelector('.popup-title').textContent = title;
+    clearErrorMessages();
   }
 
   function closeEditor() {
@@ -204,6 +224,22 @@ document.addEventListener('DOMContentLoaded', () => {
     taskDescription.value = '';
     startTime.value = '';
     endTime.value = '';
+    clearErrorMessages();
+  }
+
+  function showError(errorClass, message) {
+    const errorElement = document.querySelector(`.${errorClass}`);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+  }
+
+  function clearErrorMessages() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(element => {
+      element.style.display = 'none';
+    });
   }
 
   function toggleButtons() {
@@ -244,5 +280,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.classList.contains('checkbox')) {
       toggleButtons();
     }
+  });
+
+  // Clear error messages when user starts typing
+  taskTitle.addEventListener('input', () => {
+    const titleError = document.querySelector('.title-error');
+    if (titleError) titleError.style.display = 'none';
+  });
+
+  taskDescription.addEventListener('input', () => {
+    const descriptionError = document.querySelector('.description-error');
+    if (descriptionError) descriptionError.style.display = 'none';
+  });
+
+  startTime.addEventListener('change', () => {
+    const timeError = document.querySelector('.time-error');
+    if (timeError) timeError.style.display = 'none';
+  });
+
+  endTime.addEventListener('change', () => {
+    const timeError = document.querySelector('.time-error');
+    if (timeError) timeError.style.display = 'none';
   });
 });
