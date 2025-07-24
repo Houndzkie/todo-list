@@ -1,4 +1,4 @@
-// Utility: Converts "14:30" -> "2:30 PM"
+// format time
 function formatTime(time) {
   const [hour, minute] = time.split(':').map(Number);
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -6,124 +6,60 @@ function formatTime(time) {
   return `${hour12}:${minute.toString().padStart(2, '0')} ${ampm}`;
 }
 
+function convertTo24(timeStr) {
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Data storage for all tasks
+  // Data storage for al tasks
   let activeTasks = [];
   let completedTasks = [];
 
-  // Cached DOM elements
+  // HTML elements
   const main = document.querySelector('main');
   const popup = document.querySelector('.popup-container');
-  const titleEl = document.querySelector('#taskTitle');
-  const descriptionEl = document.querySelector('#taskDescription');
-  const startEl = document.querySelector('#start-time');
-  const endEl = document.querySelector('#end-time');
+  const taskTitle = document.querySelector('#taskTitle');
+  const taskDescription = document.querySelector('#taskDescription');
+  const startTime = document.querySelector('#start-time');
+  const endTime = document.querySelector('#end-time');
   const saveBtn = document.querySelector('.save-btn');
   const cancelBtn = document.querySelector('.cancel-btn');
   const checkBtn = document.querySelector('.check-task');
   const deleteBtn = document.querySelector('.delete-task');
-  const addTaskBtn = document.querySelector('.add-task');
+  const addBtn = document.querySelector('.add-task');
+  const checkbox = document.querySelector('.checkbox');
+  const activeTasksBtn = document.querySelector('.active-task');
+  const completedTasksBtn = document.querySelector('.completed-task');
 
-  // Editor state
+  // editor state
   let editMode = false;
   let currentTaskElement = null;
 
-  // =============================
-  // Task Logic
-  // =============================
-
-  function createTask(title, description, start, end) {
-    console.log('Creating task:', { title, description, start, end });
-    return { title, description, start, end, completed: false };
+  function createTaskObject(title, description, start, end) {
+    return {
+      id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      title,
+      description,
+      start,
+      end,
+      completed: false
+    };
   }
-
-  function showActiveTasks() {
-    const tasks = document.querySelectorAll('.task');
-    tasks.forEach(task => {
-      if (!task.classList.contains('completed')) {
-        task.style.display = 'flex';
-      } else {
-        task.style.display = 'none';
-      }
-    });
-    
-    // Update button styles
-    document.querySelector('.active-task').style.opacity = '1';
-    document.querySelector('.completed-task').style.opacity = '0.5';
-  }
-
-  function showCompletedTasks() {
-    const tasks = document.querySelectorAll('.task');
-    tasks.forEach(task => {
-      if (task.classList.contains('completed')) {
-        task.style.display = 'flex';
-      } else {
-        task.style.display = 'none';
-      }
-    });
-    
-    // Update button styles
-    document.querySelector('.active-task').style.opacity = '0.5';
-    document.querySelector('.completed-task').style.opacity = '1';
-  }
-
-  function deleteSelectedTasks() {
-    const checkboxes = document.querySelectorAll('.checkbox:checked');
-    checkboxes.forEach(checkbox => {
-      const taskElement = checkbox.closest('.task');
-      if (taskElement) {
-        // Add fade-out animation
-        taskElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        taskElement.style.opacity = '0';
-        taskElement.style.transform = 'scale(0.95)';
-        
-        // Remove the element after animation
-        setTimeout(() => {
-          taskElement.remove();
-          // Update button states after deletion
-          bindCheckboxToggles();
-        }, 300);
-      }
-    });
-  }
-
-  function completeSelectedTasks() {
-    const checkboxes = document.querySelectorAll('.checkbox:checked');
-    checkboxes.forEach(checkbox => {
-      const taskElement = checkbox.closest('.task');
-      if (taskElement) {
-        taskElement.classList.add('completed');
-        
-        // Update the task's completed status
-        const taskIndex = tasks.findIndex(t => 
-          t.title === taskElement.querySelector('.title span').innerText
-        );
-        if (taskIndex !== -1) {
-          tasks[taskIndex].completed = true;
-        }
-
-        // If we're in active tasks view, hide the completed task
-        if (document.querySelector('.active-task').style.opacity === '1') {
-          taskElement.style.display = 'none';
-        }
-
-        // Disable the checkbox and edit button
-        checkbox.disabled = true;
-        taskElement.querySelector('.edit-task').disabled = true;
-
-        // Uncheck the checkbox
-        checkbox.checked = false;
-      }
-    });
-    
-    // Update button states and save to localStorage
-    bindCheckboxToggles();
-  }
-
+  
   function formatTaskHTML(task) {
     return `
-      <div class="task ${task.completed ? 'completed' : ''}">
+      <div class="task ${task.completed ? 'completed' : ''}" data-id="${task.id}">
         <div class="task-operations">
           <div class="input-div">
             <input type="checkbox" class="checkbox" ${task.completed ? 'disabled' : ''}>
@@ -142,184 +78,288 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>`;
   }
 
-  function addTask(task) {
-    console.log('Before pushing task:', activeTasks);
-    activeTasks.push(task);
-    console.log('After pushing task:', activeTasks);
+  function addTask() {
+    clearForm();
+    openEditor("Add Task");
+  }
 
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = formatTaskHTML(task);
-    const taskElement = wrapper.firstElementChild;
+  function editTask(taskElement, taskData) {
+    currentTaskElement = taskElement;
+    editMode = true;
+  
+    taskTitle.value = taskData.title;
+    taskDescription.value = taskData.description;
+    startTime.value = convertTo24(taskData.start);
+    endTime.value = convertTo24(taskData.end);
+  
+    openEditor("Edit Task");
+  }
 
-    taskElement.querySelector('.edit-task').addEventListener('click', () => {
-      openEditor("Edit Task", taskElement);
+  function deleteTask() {
+    const checkedBoxes = document.querySelectorAll('.task .checkbox:checked');
+  
+    checkedBoxes.forEach(cb => {
+      const taskEl = cb.closest('.task');
+      const taskId = taskEl.dataset.id;
+  
+      // Remove from activeTasks
+      const taskIndex = activeTasks.findIndex(t => t.id === taskId);
+      if (taskIndex !== -1) {
+        activeTasks.splice(taskIndex, 1);
+      }
+  
+      // Remove from DOM
+      taskEl.remove();
+    });
+  
+    toggleButtons(); // Disable buttons again if no tasks are selected
+  }
+
+  function saveTask() {
+    const title = taskTitle.value.trim();
+    const description = taskDescription.value.trim();
+    const start = startTime.value;
+    const end = endTime.value;
+  
+    // Clear previous error messages
+    clearErrorMessages();
+  
+    // 1. Validate empty fields
+    if (!title || !description) {
+      if (!title) {
+        showError('title-error', 'Task title is required');
+      }
+      if (!description) {
+        showError('description-error', 'Task description is required');
+      }
+      return;
+    }
+  
+    // 2. Validate time logic
+    if (!start || !end) {
+      showError('time-error', 'Start time and end time are required');
+      return;
+    }
+  
+    if (start >= end) {
+      showError('time-error', 'End time must be later than start time');
+      return;
+    }
+  
+    // 3. Continue if valid
+    const formattedStart = formatTime(start);
+    const formattedEnd = formatTime(end);
+  
+    if (editMode && currentTaskElement) {
+      // Editing existing task
+      const taskId = currentTaskElement.dataset.id;
+      const task = activeTasks.find(t => t.id === taskId);
+      if (!task) return;
+  
+      task.title = title;
+      task.description = description;
+      task.start = formattedStart;
+      task.end = formattedEnd;
+  
+      currentTaskElement.querySelector('.title span').textContent = title;
+      currentTaskElement.querySelector('.description p').textContent = description;
+      currentTaskElement.querySelector('.time p').textContent = `🕐 ${formattedStart} - ${formattedEnd}`;
+    } else {
+      // Creating new task
+      const task = createTaskObject(title, description, formattedStart, formattedEnd);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = formatTaskHTML(task);
+      const taskElement = wrapper.firstElementChild;
+  
+      main.appendChild(taskElement);
+      activeTasks.push(task);
+    }
+  
+    closeEditor();
+
+    console.log(activeTasks);
+  }
+
+  function completeTask() {
+    const checkedBoxes = document.querySelectorAll('.task .checkbox:checked');
+
+    checkedBoxes.forEach(cb => {
+      const taskEl = cb.closest('.task');
+      const taskId = taskEl.dataset.id;
+
+      // Find index in activeTasks
+      const taskIndex = activeTasks.findIndex(t => t.id === taskId);
+      if (taskIndex !== -1) {
+        // Remove from activeTasks and mark completed
+        const [task] = activeTasks.splice(taskIndex, 1);
+        task.completed = true;
+
+        // Add to completedTasks
+        completedTasks.push(task);
+
+        // Update DOM
+        taskEl.classList.add('completed');
+        cb.disabled = true;
+        const editBtn = taskEl.querySelector('.edit-task');
+        if (editBtn) editBtn.disabled = true;
+      }
     });
 
-    // Add to main and show/hide based on current view
-    main.appendChild(taskElement);
-    
-    // If we're in completed tasks view, hide the new task
-    if (document.querySelector('.completed-task').style.opacity === '1') {
-      taskElement.style.display = 'none';
-    }
-
-    bindCheckboxToggles();
+    toggleButtons(); // Re-disable buttons after action
   }
 
-  function updateTask(taskEl, updatedTask) {
-    taskEl.querySelector('.title span').innerText = updatedTask.title;
-    taskEl.querySelector('.description p').innerText = updatedTask.description;
-    taskEl.querySelector('.time p').innerText = `🕐 ${updatedTask.start} - ${updatedTask.end}`;
-    bindCheckboxToggles();
-  }
-
-  function getTaskFromElement(el) {
-    const title = el.querySelector('.title span').innerText;
-    const description = el.querySelector('.description p').innerText;
-    const timeText = el.querySelector('.time p').innerText.replace('🕐 ', '');
-    const [start, end] = timeText.split(' - ');
-    return createTask(title, description, start, end);
-  }
-
-  // =============================
-  // Popup / Editor Logic
-  // =============================
-
-  function clearForm() {
-    titleEl.value = '';
-    descriptionEl.value = '';
-    startEl.value = '';
-    endEl.value = '';
-  }
-
-  function openEditor(title = "Add Task", taskElement = null) {
-    document.querySelector('.popup-title').innerText = title;
+  function openEditor(title) {
     popup.style.display = 'flex';
-
-    if (taskElement) {
-      editMode = true;
-      currentTaskElement = taskElement;
-      const task = getTaskFromElement(taskElement);
-      titleEl.value = task.title;
-      descriptionEl.value = task.description;
-      startEl.value = task.start;
-      endEl.value = task.end;
-    } else {
-      editMode = false;
-      clearForm();
-    }
+    popup.querySelector('.popup-title').textContent = title;
+    clearErrorMessages();
   }
 
   function closeEditor() {
     popup.style.display = 'none';
     clearForm();
+    editMode = false;
+    currentTaskElement = null;
   }
 
-  function saveTask() {
-    const title = titleEl.value.trim();
-    const description = descriptionEl.value.trim();
-    const startTime = startEl.value;
-    const endTime = endEl.value;
-    
-    console.log('Saving task with values:', { title, description, startTime, endTime });
-    
-    // Get all error message elements
-    const titleError = document.querySelector('.title-error');
-    const descriptionError = document.querySelector('.description-error');
-    const timeError = document.querySelector('.time-error');
-    
-    // Reset all error messages
-    timeError.style.display = 'none';
-    titleError.style.display = 'none';
-    descriptionError.style.display = 'none';
-    
-    // Validate required fields
-    let hasError = false;
-    
-    if (!title) {
-      titleError.style.display = 'block';
-      hasError = true;
+  function clearForm() {
+    taskTitle.value = '';
+    taskDescription.value = '';
+    startTime.value = '';
+    endTime.value = '';
+    clearErrorMessages();
+  }
+
+  function showError(errorClass, message) {
+    const errorElement = document.querySelector(`.${errorClass}`);
+    if (errorElement) {
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
     }
-    
-    if (!description) {
-      descriptionError.style.display = 'block';
-      hasError = true;
-    }
+  }
 
-    // Convert times to comparable values (minutes since midnight)
-    const [startHour, startMinute] = startTime.split(':').map(Number);
-    const [endHour, endMinute] = endTime.split(':').map(Number);
-    const startTotalMinutes = startHour * 60 + startMinute;
-    const endTotalMinutes = endHour * 60 + endMinute;
+  function clearErrorMessages() {
+    const errorElements = document.querySelectorAll('.error-message');
+    errorElements.forEach(element => {
+      element.style.display = 'none';
+    });
+  }
 
-    // Validate time
-    if (startTotalMinutes >= endTotalMinutes) {
-      timeError.style.display = 'block';
-      hasError = true;
-    }
+  function toggleButtons() {
+    // Only consider visible tasks (not hidden by page switching)
+    const checkboxes = document.querySelectorAll('.task:not([style*="display: none"]) .checkbox');
+    const isAnyChecked = [...checkboxes].some(cb => cb.checked);
 
-    // If there are any errors, don't save
-    if (hasError) {
-      console.log('Validation errors found, not saving task');
-      return;
-    }
-
-    const start = formatTime(startTime);
-    const end = formatTime(endTime);
-
-    const task = createTask(title, description, start, end);
-    console.log('Created task object:', task);
-
-    if (editMode) {
-      updateTask(currentTaskElement, task);
+    if (isAnyChecked) {
+      checkBtn.disabled = false;
+      deleteBtn.disabled = false;
+      checkBtn.style.opacity = 1;
+      deleteBtn.style.opacity = 1;
+      checkBtn.style.cursor = 'pointer';
+      deleteBtn.style.cursor = 'pointer';
     } else {
-      addTask(task);
+      checkBtn.disabled = true;
+      deleteBtn.disabled = true;
+      checkBtn.style.opacity = 0.5;
+      deleteBtn.style.opacity = 0.5;
+      checkBtn.style.cursor = 'default';
+      deleteBtn.style.cursor = 'default';
     }
-
-    closeEditor();
   }
 
-  // =============================
-  // Checkbox Button Toggle Logic
-  // =============================
-
-  function bindCheckboxToggles() {
-    const checkboxes = document.querySelectorAll('.checkbox');
-
-    function toggleButton(btn) {
-      function update() {
-        const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-        btn.style.opacity = anyChecked ? 1 : 0.5;
-        btn.style.pointerEvents = anyChecked ? 'auto' : 'none';
+  function activeTasksPage() {
+    // Show active tasks, hide completed tasks
+    const allTasks = document.querySelectorAll('.task');
+    allTasks.forEach(task => {
+      if (!task.classList.contains('completed')) {
+        task.style.display = 'block';
+      } else {
+        task.style.display = 'none';
       }
-
-      checkboxes.forEach(cb => {
-        cb.removeEventListener('change', update);
-        cb.addEventListener('change', update);
-      });
-
-      update();
-    }
-
-    toggleButton(checkBtn);
-    toggleButton(deleteBtn);
+    });
+    
+    // Update button styles to show active page is selected
+    activeTasksBtn.style.background = 'linear-gradient(135deg, #3730a3, #5b21b6)';
+    activeTasksBtn.style.transform = 'scale(1.05)';
+    completedTasksBtn.style.background = 'linear-gradient(135deg, #059669, #0d9488)';
+    completedTasksBtn.style.transform = 'scale(1)';
+    
+    // Enable/disable operation buttons based on visible tasks
+    toggleButtons();
   }
 
-  // =============================
-  // Event Binding (Startup)
-  // =============================
+  function completedTasksPage() {
+    // Show completed tasks, hide active tasks
+    const allTasks = document.querySelectorAll('.task');
+    allTasks.forEach(task => {
+      if (task.classList.contains('completed')) {
+        task.style.display = 'block';
+      } else {
+        task.style.display = 'none';
+      }
+    });
+    
+    // Update button styles to show completed page is selected
+    completedTasksBtn.style.background = 'linear-gradient(135deg, #047857, #0f766e)';
+    completedTasksBtn.style.transform = 'scale(1.05)';
+    activeTasksBtn.style.background = 'linear-gradient(135deg, #4f46e5, #7c3aed)';
+    activeTasksBtn.style.transform = 'scale(1)';
+    
+    // Disable operation buttons since completed tasks can't be edited
+    checkBtn.disabled = true;
+    deleteBtn.disabled = true;
+    checkBtn.style.opacity = 0.5;
+    deleteBtn.style.opacity = 0.5;
+    checkBtn.style.cursor = 'default';
+    deleteBtn.style.cursor = 'default';
+  }
 
-  addTaskBtn.addEventListener('click', () => openEditor("Add Task"));
+  // add event listeners
+  addBtn.addEventListener('click', addTask);
+  deleteBtn.addEventListener('click', deleteTask);
+  checkBtn.addEventListener('click', completeTask);
   cancelBtn.addEventListener('click', closeEditor);
   saveBtn.addEventListener('click', saveTask);
-  deleteBtn.addEventListener('click', deleteSelectedTasks);
-  checkBtn.addEventListener('click', completeSelectedTasks);
-  
-  // Add event listeners for status buttons
-  document.querySelector('.active-task').addEventListener('click', showActiveTasks);
-  document.querySelector('.completed-task').addEventListener('click', showCompletedTasks);
+  // Handles clicks (like editing)
+  main.addEventListener('click', (e) => {
+    if (e.target.classList.contains('edit-task')) {
+      const taskEl = e.target.closest('.task');
+      const taskId = taskEl.dataset.id;
+      const taskData = activeTasks.find(t => t.id === taskId);
+      editTask(taskEl, taskData);
+    }
+  });
 
-  // Initialize checkbox toggles and show active tasks by default
-  bindCheckboxToggles();
-  showActiveTasks();
+  // Handles checkbox changes
+  main.addEventListener('change', (e) => {
+    if (e.target.classList.contains('checkbox')) {
+      toggleButtons();
+    }
+  });
+
+  // Clear error messages when user starts typing
+  taskTitle.addEventListener('input', () => {
+    const titleError = document.querySelector('.title-error');
+    if (titleError) titleError.style.display = 'none';
+  });
+
+  taskDescription.addEventListener('input', () => {
+    const descriptionError = document.querySelector('.description-error');
+    if (descriptionError) descriptionError.style.display = 'none';
+  });
+
+  startTime.addEventListener('change', () => {
+    const timeError = document.querySelector('.time-error');
+    if (timeError) timeError.style.display = 'none';
+  });
+
+  endTime.addEventListener('change', () => {
+    const timeError = document.querySelector('.time-error');
+    if (timeError) timeError.style.display = 'none';
+  });
+
+  activeTasksBtn.addEventListener('click', activeTasksPage);
+  completedTasksBtn.addEventListener('click', completedTasksPage);
+  
+  // Initialize the page to show active tasks by default
+  activeTasksPage();
 });
