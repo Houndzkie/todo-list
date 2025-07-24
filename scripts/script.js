@@ -22,7 +22,7 @@ function convertTo24(timeStr) {
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Data storage for al tasks
+  // Data storage for all tasks
   let activeTasks = [];
   let completedTasks = [];
 
@@ -206,6 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     toggleButtons(); // Re-disable buttons after action
+    console.log(activeTasks);
+    console.log(completedTasks);
   }
 
   function openEditor(title) {
@@ -271,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allTasks = document.querySelectorAll('.task');
     allTasks.forEach(task => {
       if (!task.classList.contains('completed')) {
-        task.style.display = 'block';
+        task.style.display = 'flex';
       } else {
         task.style.display = 'none';
       }
@@ -292,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const allTasks = document.querySelectorAll('.task');
     allTasks.forEach(task => {
       if (task.classList.contains('completed')) {
-        task.style.display = 'block';
+        task.style.display = 'flex';
       } else {
         task.style.display = 'none';
       }
@@ -311,6 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteBtn.style.opacity = 0.5;
     checkBtn.style.cursor = 'default';
     deleteBtn.style.cursor = 'default';
+    
+    // Debug: Check time values in completed tasks
+    console.log('Completed Tasks Page - Completed Tasks:', completedTasks.map(t => ({ id: t.id, start: t.start, end: t.end })));
   }
 
   // add event listeners
