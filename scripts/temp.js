@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   toggleButtons(); // Re-disable buttons after action
-}
+  }
 
   function openEditor(title) {
     popup.style.display = 'flex';
@@ -245,7 +245,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function toggleButtons() {
-    const checkboxes = document.querySelectorAll('.task .checkbox');
+    // Only consider visible tasks (not hidden by page switching)
+    const checkboxes = document.querySelectorAll('.task:not([style*="display: none"]) .checkbox');
     const isAnyChecked = [...checkboxes].some(cb => cb.checked);
 
     if (isAnyChecked) {
@@ -260,9 +261,56 @@ document.addEventListener('DOMContentLoaded', () => {
       deleteBtn.disabled = true;
       checkBtn.style.opacity = 0.5;
       deleteBtn.style.opacity = 0.5;
-      checkBtn.style.cursor = 'none';
-      deleteBtn.style.cursor = 'none';
+      checkBtn.style.cursor = 'default';
+      deleteBtn.style.cursor = 'default';
     }
+  }
+
+  function activeTasksPage() {
+    // Show active tasks, hide completed tasks
+    const allTasks = document.querySelectorAll('.task');
+    allTasks.forEach(task => {
+      if (!task.classList.contains('completed')) {
+        task.style.display = 'block';
+      } else {
+        task.style.display = 'none';
+      }
+    });
+    
+    // Update button styles to show active page is selected
+    activeTasksBtn.style.background = 'linear-gradient(135deg, #3730a3, #5b21b6)';
+    activeTasksBtn.style.transform = 'scale(1.05)';
+    completedTasksBtn.style.background = 'linear-gradient(135deg, #059669, #0d9488)';
+    completedTasksBtn.style.transform = 'scale(1)';
+    
+    // Enable/disable operation buttons based on visible tasks
+    toggleButtons();
+  }
+
+  function completedTasksPage() {
+    // Show completed tasks, hide active tasks
+    const allTasks = document.querySelectorAll('.task');
+    allTasks.forEach(task => {
+      if (task.classList.contains('completed')) {
+        task.style.display = 'block';
+      } else {
+        task.style.display = 'none';
+      }
+    });
+    
+    // Update button styles to show completed page is selected
+    completedTasksBtn.style.background = 'linear-gradient(135deg, #047857, #0f766e)';
+    completedTasksBtn.style.transform = 'scale(1.05)';
+    activeTasksBtn.style.background = 'linear-gradient(135deg, #4f46e5, #7c3aed)';
+    activeTasksBtn.style.transform = 'scale(1)';
+    
+    // Disable operation buttons since completed tasks can't be edited
+    checkBtn.disabled = true;
+    deleteBtn.disabled = true;
+    checkBtn.style.opacity = 0.5;
+    deleteBtn.style.opacity = 0.5;
+    checkBtn.style.cursor = 'default';
+    deleteBtn.style.cursor = 'default';
   }
 
   // add event listeners
@@ -308,4 +356,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeError = document.querySelector('.time-error');
     if (timeError) timeError.style.display = 'none';
   });
+
+  activeTasksBtn.addEventListener('click', activeTasksPage);
+  completedTasksBtn.addEventListener('click', completedTasksPage);
+  
+  // Initialize the page to show active tasks by default
+  activeTasksPage();
 });
