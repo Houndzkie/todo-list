@@ -26,6 +26,45 @@ document.addEventListener('DOMContentLoaded', () => {
   let activeTasks = [];
   let completedTasks = [];
 
+  // localStorage functionality
+  const STORAGE_KEY = 'todoListData';
+
+  function saveToStorage() {
+    const data = {
+      activeTasks: activeTasks,
+      completedTasks: completedTasks
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadFromStorage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        activeTasks = data.activeTasks || [];
+        completedTasks = data.completedTasks || [];
+        
+        // Render all tasks to DOM
+        main.innerHTML = '';
+        activeTasks.forEach(task => {
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = formatTaskHTML(task);
+          main.appendChild(wrapper.firstElementChild);
+        });
+        completedTasks.forEach(task => {
+          const wrapper = document.createElement('div');
+          wrapper.innerHTML = formatTaskHTML(task);
+          main.appendChild(wrapper.firstElementChild);
+        });
+      } catch (error) {
+        console.error('Error loading data from localStorage:', error);
+        activeTasks = [];
+        completedTasks = [];
+      }
+    }
+  }
+
   // HTML elements
   const main = document.querySelector('main');
   const popup = document.querySelector('.popup-container');
@@ -113,6 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   
     toggleButtons(); // Disable buttons again if no tasks are selected
+    
+    // Save to localStorage after deleting tasks
+    saveToStorage();
   }
 
   function saveTask() {
@@ -176,6 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   
     closeEditor();
+    
+    // Save to localStorage after any data change
+    saveToStorage();
 
     console.log(activeTasks);
   }
@@ -206,6 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     toggleButtons(); // Re-disable buttons after action
+    
+    // Save to localStorage after completing tasks
+    saveToStorage();
+    
     console.log(activeTasks);
     console.log(completedTasks);
   }
@@ -364,6 +413,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   activeTasksBtn.addEventListener('click', activeTasksPage);
   completedTasksBtn.addEventListener('click', completedTasksPage);
+  
+  // Load data from localStorage when page loads
+  loadFromStorage();
   
   // Initialize the page to show active tasks by default
   activeTasksPage();
